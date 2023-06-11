@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+
 import 'dart:convert';
 
-import 'HomePage.dart';
+import 'home_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,9 +41,15 @@ class _LoginPageState extends State<LoginPage> {
       'username': userName,
       'password': password
     };
+    var jsonPart = http.MultipartFile.fromString(
+      'userLoginPayload',
+      jsonEncode(formData),
+      contentType: MediaType('application', 'json'),
+    );
     var request = http.MultipartRequest('POST', url);
-    request.fields['userLoginPayload'] = jsonEncode(formData);
-    request.headers['Content-Type'] = 'multipart/form-data';
+
+    request.files.add(jsonPart);
+
     var response = await request.send();
 
     if (response.statusCode == 200) {
@@ -122,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                 labelText: 'Username',
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               onChanged: (value) {
                 setState(() {
@@ -134,10 +142,10 @@ class _LoginPageState extends State<LoginPage> {
                 labelText: 'Password',
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: login,
-              child: Text('Login'),
+              child: const Text('Login'),
             ),
           ],
         ),

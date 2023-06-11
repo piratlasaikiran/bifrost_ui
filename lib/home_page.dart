@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'Employees/employee_options_page.dart';
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -13,11 +15,14 @@ class HomePage extends StatelessWidget {
         crossAxisCount: 2,
         children: [
           ButtonTile(
-            title: 'Employee',
+            title: 'Employees',
             color: Colors.blue,
             icon: Icons.people,
             onTap: () {
-              // Action to perform when 'Employee' button is clicked
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const EmployeeOptionsPage()),
+              );
             },
           ),
           ButtonTile(
