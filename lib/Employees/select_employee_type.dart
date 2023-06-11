@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'Driver/driver_page.dart';
 import 'Supervisor/supervisor_page.dart';
 
 class SelectEmployeeTypeDialog extends StatefulWidget {
@@ -28,7 +29,12 @@ class _SelectEmployeeTypeDialogState extends State<SelectEmployeeTypeDialog> {
         },
       );
     } else if (option == 'Driver') {
-      // Action for Driver option
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return const DriverInputDialog();
+        },
+      );
     } else if (option == 'Vendor') {
       // Action for Vendor option
     }
