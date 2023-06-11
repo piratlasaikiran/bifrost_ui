@@ -1,3 +1,4 @@
+import 'package:bifrost_ui/utils/user_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -35,6 +36,10 @@ class _LoginPageState extends State<LoginPage> {
   String password = '';
 
   Future<bool> sendFormData(String userName, String password) async {
+
+    //Storing via singleton manner to access across application
+    UserManager userManager = UserManager();
+    userManager.username = userName;
 
     var url = Uri.parse('http://10.0.2.2:6852/bifrost/users/login');
     var formData = {

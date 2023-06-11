@@ -1,7 +1,11 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http_parser/http_parser.dart';
+
+import 'package:bifrost_ui/main.dart';
+
+import '../../utils/user_manager.dart';
 
 class SupervisorActions {
 
@@ -17,6 +21,7 @@ class SupervisorActions {
     required String? vehicleNumber,
     required double? otPay,
   }) async {
+    UserManager userManager = UserManager();
     var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/create-new-supervisor');
     var formData = {
       'name': name,
@@ -29,11 +34,17 @@ class SupervisorActions {
       'vehicle_num': vehicleNumber,
       'ot_pay': otPay
     };
-
+    var jsonPart = http.MultipartFile.fromString(
+      'createSupervisorPayload',
+      jsonEncode(formData),
+      contentType: MediaType('application', 'json'),
+    );
     var request = http.MultipartRequest('POST', url);
-    // var imageField = await http.MultipartFile.fromPath('aadhar', aadhar!.path);
-    request.fields['createSupervisorPayload'] = jsonEncode(formData);
-    // request.files.add(imageField);
+    request.headers['X-User-Id'] = userManager.username;
+    var imageField = await http.MultipartFile.fromPath('aadhar', aadhar!.path);
+
+    request.files.add(jsonPart);
+    request.files.add(imageField);
 
     var response = await request.send();
     if(response.statusCode == 200) {
