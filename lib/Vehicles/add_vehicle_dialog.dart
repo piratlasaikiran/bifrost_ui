@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
@@ -37,11 +38,10 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
   late String _vehicleClass;
   String? _insuranceProvider;
   String? _financeProvider;
+  final List<VehicleTax> _vehicleTaxes = [];
 
   bool _isInsuranceProviderNotApplicable = false;
   bool _isFinanceProviderNotApplicable = false;
-
-  List<VehicleTax> _vehicleTaxes = [];
 
   void _toggleInsuranceProviderNotApplicable() {
     setState(() {
@@ -61,13 +61,25 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
     });
   }
 
-  void _saveVehicle() {
+  Future<void> _saveVehicle() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      // Perform save operation or any other desired action with the entered vehicle details
-      // Here, we're just printing the entered details to the console
+      VehicleActions vehicleActions = VehicleActions();
+      final result = await vehicleActions.saveVehicle(vehicleNumber: _vehicleNumber,
+          owner: _owner,
+          chassisNumber: _chassisNumber,
+          engineNumber: _engineNumber,
+          vehicleClass: _vehicleClass,
+          insuranceProvider: _insuranceProvider,
+          financeProvider: _financeProvider,
+          vehicleTaxes: _vehicleTaxes);
 
+      if(result){
+
+      }else{
+
+      }
       // Close the dialog
       Navigator.of(context).pop();
     }

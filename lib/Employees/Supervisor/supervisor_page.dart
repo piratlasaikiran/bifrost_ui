@@ -59,7 +59,7 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text('Success'),
-              content: Text('Supervisor saved successfully.'),
+              content: const Text('Supervisor saved successfully.'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -77,8 +77,8 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Failure'),
-              content: Text('Failed to save supervisor.'),
+              title: const Text('Failure'),
+              content: const Text('Failed to save supervisor.'),
               actions: [
                 TextButton(
                   onPressed: () {
