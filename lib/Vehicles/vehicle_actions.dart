@@ -37,10 +37,11 @@ class VehicleActions{
       jsonEncode(formData),
       contentType: MediaType('application', 'json'),
     );
+
+    List<VehicleTaxRequest> vehicleTaxRequest = await imageSegregateHelper(vehicleTaxes, request);
     var taxesJsonPart = http.MultipartFile.fromString(
       'vehicleTaxes',
-      // jsonEncode(Future.delayed(const Duration(seconds: 1), () {imageSegregateHelper(vehicleTaxes, request);})),
-      jsonEncode(imageSegregateHelper(vehicleTaxes, request)),
+      jsonEncode(vehicleTaxRequest.map((request) => request.toJson()).toList()),
       contentType: MediaType('application', 'json'),
     );
 

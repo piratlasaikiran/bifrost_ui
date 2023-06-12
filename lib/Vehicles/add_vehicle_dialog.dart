@@ -31,6 +31,8 @@ class AddVehicleDialog extends StatefulWidget {
 
 class _AddVehicleDialogState extends State<AddVehicleDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late BuildContext dialogContext;
+
   late String _vehicleNumber;
   late String _owner;
   late String _chassisNumber;
@@ -75,13 +77,45 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
           financeProvider: _financeProvider,
           vehicleTaxes: _vehicleTaxes);
 
-      if(result){
-
-      }else{
-
+      if (result) {
+        // Show success popup
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Success'),
+              content: const Text('Vehicle saved successfully.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(dialogContext).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Failure'),
+              content: const Text('Failed to save vehicle.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
       }
-      // Close the dialog
-      Navigator.of(context).pop();
     }
   }
 
@@ -277,6 +311,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               _formKey.currentState!.save();
+              dialogContext = context;
               _saveVehicle();
             }
           },
