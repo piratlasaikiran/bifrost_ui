@@ -1,40 +1,53 @@
+import 'package:bifrost_ui/Employees/Driver/driver_actions.dart';
 import 'package:flutter/material.dart';
 
-import 'Driver/driver_page.dart';
-import 'Supervisor/supervisor_page.dart';
 
-class SelectEmployeeTypeDialog extends StatefulWidget {
-  const SelectEmployeeTypeDialog({super.key});
+import 'Driver/driver_list_page.dart';
+import 'Supervisor/supervisor_actions.dart';
+import 'Supervisor/supervisor_list_page.dart';
+
+
+class SelectEmployeeTypeForViewDialog extends StatefulWidget {
+  const SelectEmployeeTypeForViewDialog({super.key});
 
 
   @override
-  _SelectEmployeeTypeDialogState createState() =>
-      _SelectEmployeeTypeDialogState();
+  _SelectEmployeeTypeForViewDialogState createState() =>
+      _SelectEmployeeTypeForViewDialogState();
 }
 
-class _SelectEmployeeTypeDialogState extends State<SelectEmployeeTypeDialog> {
+class _SelectEmployeeTypeForViewDialogState extends State<SelectEmployeeTypeForViewDialog> {
   String? selectedOption;
 
-  void selectOption(String? option) {
+  Future<void> selectOption(String? option) async {
     setState(() {
       selectedOption = option;
     });
 
     // Perform different actions based on the selected option
     if (option == 'Supervisor') {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return const SupervisorInputDialog();
-        },
-      );
+      SupervisorActions supervisorActions = SupervisorActions();
+      List<SupervisorDTO> supervisorDTOs = await supervisorActions.getAllSupervisors();
+      Future.microtask(() {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                SupervisorListPage(supervisors: supervisorDTOs),
+          ),
+        );
+      });
     } else if (option == 'Driver') {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return const DriverInputDialog();
-        },
-      );
+      DriverActions driverActions = DriverActions();
+      List<DriverDTO> driverDTOs = await driverActions.getAllDrivers();
+      Future.microtask(() {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DriverListPage(drivers: driverDTOs),
+          ),
+        );
+      });
     } else if (option == 'Vendor') {
       // Action for Vendor option
     }

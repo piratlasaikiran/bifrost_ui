@@ -1,4 +1,5 @@
-import 'package:bifrost_ui/Employees/select_employee_type.dart';
+import 'package:bifrost_ui/Employees/select_employee_type_create.dart';
+import 'package:bifrost_ui/Employees/select_employee_type_view.dart';
 import 'package:flutter/material.dart';
 
 class ManageEmployeesPage extends StatelessWidget {
@@ -21,17 +22,20 @@ class ManageEmployeesPage extends StatelessWidget {
               onTap: () {
                 showDialog(
                   context: context,
-                  builder: (BuildContext context) => const SelectEmployeeTypeDialog(),
+                  builder: (BuildContext context) => const SelectEmployeeTypeForCreationDialog(),
                 );
               },
             ),
             const SizedBox(height: 16.0),
             CircularButton(
-              icon: Icons.edit,
-              label: 'Update\nEmployee',
+              icon: Icons.list,
+              label: 'View\nEmployees',
               color: Colors.orange,
               onTap: () {
-                // Action to perform when 'Update Employee' button is clicked
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => const SelectEmployeeTypeForViewDialog(),
+                );
               },
             ),
           ],
