@@ -7,6 +7,26 @@ import 'package:http_parser/http_parser.dart';
 import '../utils/user_manager.dart';
 import 'add_vehicle_dialog.dart';
 
+class VehicleDTO {
+  final String? vehicleNumber;
+  final String? owner;
+  final String? chassisNumber;
+  final String? engineNumber;
+  final String? vehicleClass;
+  final String? insuranceProvider;
+  final String? financeProvider;
+
+
+  VehicleDTO({
+    required this.vehicleNumber,
+    required this.owner,
+    required this.chassisNumber,
+    required this.engineNumber,
+    required this.vehicleClass,
+    required this.insuranceProvider,
+    required this.financeProvider
+  });
+}
 
 class VehicleActions{
   Future<bool> saveVehicle({
@@ -95,5 +115,34 @@ class VehicleActions{
       }
     }
     return vehicleTaxDetails;
+  }
+
+  Future<List<VehicleDTO>> getAllVehicles() async{
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<dynamic> vehicleDTOs = jsonDecode(response.body);
+    final List<VehicleDTO> vehicles = vehicleDTOs.map((data) {
+      return VehicleDTO(
+          vehicleNumber: data['vehicle_num'] as String?,
+          owner: data['owner'] as String?,
+          chassisNumber: data['chassis_num'] as String?,
+          engineNumber: data['engine_num'] as String?,
+          vehicleClass: data['vehicle_class'] as String?,
+          insuranceProvider: data['insurance_provider'] as String?,
+          financeProvider: data['finance_provider'] as String?
+      );
+    }).toList();
+    return vehicles;
+  }
+
+  Future<List<String>> getVehicleNumbers() async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/get-vehicle-numbers');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<String> vehicleNumbers = jsonDecode(response.body).cast<String>();
+    return vehicleNumbers;
   }
 }

@@ -1,60 +1,40 @@
-import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
-import 'package:bifrost_ui/Vehicles/vehicle_list_page.dart';
+import 'package:bifrost_ui/Assets/asset_actions.dart';
+import 'package:bifrost_ui/Assets/asset_list_page.dart';
 import 'package:flutter/material.dart';
 
-import 'add_vehicle_dialog.dart';
 
-class VehicleOptionsPage extends StatelessWidget {
-  const VehicleOptionsPage({super.key});
-
+class AssetOptionsPage extends StatelessWidget {
+  const AssetOptionsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vehicle Actions'),
+        title: const Text('Asset Options'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildCircularButton(
-              icon: Icons.add,
-              label: 'Add Vehicle',
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return const AddVehicleDialog();
-                  },
-                );
-              },
-            ),
-            const SizedBox(height: 16.0),
-            _buildCircularButton(
-              icon: Icons.upload_file,
-              label: 'Upload Tax Receipt',
-              onTap: () {
-                // Action to perform when 'Upload Tax Receipt' button is clicked
-              },
-            ),
-            const SizedBox(height: 16.0),
-            _buildCircularButton(
-              icon: Icons.car_rental,
-              label: 'View Vehicles',
+              icon: Icons.supervisor_account,
+              label: 'Manage Assets',
               onTap: () async {
-                VehicleActions vehicleActions = VehicleActions();
-                List<VehicleDTO> vehicleDTOs = await vehicleActions.getAllVehicles();
+                AssetActions assetActions = AssetActions();
+                List<AssetDTO> assetDTOs = await assetActions.getAllAssetLocations();
                 Future.microtask(() {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => VehicleListPage(vehicles: vehicleDTOs),
+                      builder: (context) => AssetListPage(assets: assetDTOs),
                     ),
                   );
                 });
               },
+              color: Colors.blue,
+              borderColor: Colors.white,
             ),
+            const SizedBox(height: 16.0),
           ],
         ),
       ),
@@ -65,15 +45,18 @@ class VehicleOptionsPage extends StatelessWidget {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    required Color color,
+    required Color borderColor,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 180.0,
         height: 180.0,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.blue,
+          color: color,
+          border: Border.all(color: borderColor, width: 2.0),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

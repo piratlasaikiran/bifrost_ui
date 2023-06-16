@@ -5,6 +5,31 @@ import 'package:http_parser/http_parser.dart';
 
 import '../../utils/user_manager.dart';
 
+class SupervisorDTO {
+  final String? name;
+  final int? mobileNumber;
+  final String? bankAccountNumber;
+  final int? salary;
+  final bool? admin;
+  final int? companyMobileNumber;
+  final int? atmCardNumber;
+  final String? vehicleNumber;
+  final int? otPay;
+
+
+  SupervisorDTO({
+    required this.name,
+    required this.mobileNumber,
+    required this.bankAccountNumber,
+    required this.salary,
+    required this.admin,
+    required this.companyMobileNumber,
+    required this.atmCardNumber,
+    required this.vehicleNumber,
+    required this.otPay
+  });
+}
+
 class SupervisorActions {
 
   Future<bool> saveSupervisor({
@@ -50,6 +75,37 @@ class SupervisorActions {
     } else {
       return false;
     }
+  }
+
+  Future<List<SupervisorDTO>> getAllSupervisors() async{
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<dynamic> supervisorDTOs = jsonDecode(response.body);
+    final List<SupervisorDTO> supervisors = supervisorDTOs.map((data) {
+      return SupervisorDTO(
+        name: data['name'] as String?,
+        mobileNumber: data['personal_mobile_num'] as int?,
+        bankAccountNumber: data['bank_ac'] as String?,
+        salary: data['salary'] as int?,
+        admin: data['admin'] as bool?,
+        companyMobileNumber: data['company_mob_num'] as int?,
+        atmCardNumber: data['atm_card'] as int?,
+        vehicleNumber: data['vehicle_num'] as String?,
+        otPay: data['ot_pay'] as int?,
+      );
+    }).toList();
+    return supervisors;
+  }
+
+  Future<List<String>> getSupervisorNames() async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/get-supervisor-names');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<String> supervisorNames = jsonDecode(response.body).cast<String>();
+    return supervisorNames;
   }
 
   void updateSupervisor({

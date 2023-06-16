@@ -1,4 +1,5 @@
-import 'package:bifrost_ui/Employees/select_employee_type.dart';
+import 'package:bifrost_ui/Employees/select_employee_type_create.dart';
+import 'package:bifrost_ui/Employees/select_employee_type_view.dart';
 import 'package:flutter/material.dart';
 
 class ManageEmployeesPage extends StatelessWidget {
@@ -14,25 +15,75 @@ class ManageEmployeesPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularButton(
+            _buildCircularButton(
               icon: Icons.person_add,
               label: 'Create\nEmployee',
-              color: Colors.green,
               onTap: () {
                 showDialog(
                   context: context,
-                  builder: (BuildContext context) => const SelectEmployeeTypeDialog(),
+                  builder: (BuildContext context) {
+                    return const SelectEmployeeTypeForCreationDialog();
+                  },
                 );
               },
+              color: Colors.blue,
+              borderColor: Colors.white,
             ),
             const SizedBox(height: 16.0),
-            CircularButton(
-              icon: Icons.edit,
-              label: 'Update\nEmployee',
-              color: Colors.orange,
+            _buildCircularButton(
+              icon: Icons.list,
+              label: 'View\nEmployeese',
               onTap: () {
-                // Action to perform when 'Update Employee' button is clicked
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return const SelectEmployeeTypeForViewDialog();
+                  },
+                );
               },
+              color: Colors.blue,
+              borderColor: Colors.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCircularButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    required Color color,
+    required Color borderColor,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 180.0,
+        height: 180.0,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color,
+          border: Border.all(color: borderColor, width: 2.0),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 48.0,
+              color: Colors.white,
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16.0,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
