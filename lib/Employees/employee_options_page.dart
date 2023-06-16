@@ -14,88 +14,70 @@ class EmployeeOptionsPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            GestureDetector(
+            _buildCircularButton(
+              icon: Icons.supervisor_account,
+              label: 'Manage Employees',
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ManageEmployeesPage()),
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return const ManageEmployeesPage();
+                  },
                 );
               },
-              child: Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.circular(12.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 4.0,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.supervisor_account,
-                      size: 48.0,
-                      color: Colors.white,
-                    ),
-                    SizedBox(height: 8.0),
-                    Text(
-                      'Manage Employees',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              color: Colors.blue,
+              borderColor: Colors.white,
             ),
             const SizedBox(height: 16.0),
-            GestureDetector(
+            _buildCircularButton(
+              icon: Icons.account_balance_wallet,
+              label: 'Pending Balances',
               onTap: () {
-                // Action to perform when 'Pending Balances' button is clicked
+                // perform action when pending balance is clicked
               },
-              child: Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.circular(12.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 4.0,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.account_balance_wallet,
-                      size: 48.0,
-                      color: Colors.white,
-                    ),
-                    SizedBox(height: 8.0),
-                    Text(
-                      'Pending Balances',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+              color: Colors.blue,
+              borderColor: Colors.white,
+            ),
+            const SizedBox(height: 16.0),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCircularButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    required Color color,
+    required Color borderColor,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 180.0,
+        height: 180.0,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color,
+          border: Border.all(color: borderColor, width: 2.0),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 48.0,
+              color: Colors.white,
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16.0,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
