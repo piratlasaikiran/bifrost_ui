@@ -2,6 +2,7 @@ import 'package:bifrost_ui/Vehicles/vehicle_options_page.dart';
 import 'package:flutter/material.dart';
 
 import 'Employees/employee_options_page.dart';
+import 'Sites/site_options_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -31,7 +32,10 @@ class HomePage extends StatelessWidget {
             color: Colors.orange,
             icon: Icons.location_on,
             onTap: () {
-              // Action to perform when 'Sites' button is clicked
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SiteOptionsPage()),
+              );
             },
           ),
           ButtonTile(

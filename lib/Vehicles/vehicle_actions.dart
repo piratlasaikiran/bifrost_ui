@@ -136,4 +136,13 @@ class VehicleActions{
     }).toList();
     return vehicles;
   }
+
+  Future<List<String>> getVehicleNumbers() async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/get-vehicle-numbers');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<String> vehicleNumbers = jsonDecode(response.body).cast<String>();
+    return vehicleNumbers;
+  }
 }

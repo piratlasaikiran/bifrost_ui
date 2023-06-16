@@ -99,6 +99,15 @@ class SupervisorActions {
     return supervisors;
   }
 
+  Future<List<String>> getSupervisorNames() async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/get-supervisor-names');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<String> supervisorNames = jsonDecode(response.body).cast<String>();
+    return supervisorNames;
+  }
+
   void updateSupervisor({
     required String supervisorId,
     required String name,
