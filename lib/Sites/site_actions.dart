@@ -35,7 +35,7 @@ class SiteActions{
     required DateTime? startDate,
     required DateTime? endDate,
   }) async {
-      // UserManager userManager = UserManager();
+      UserManager userManager = UserManager();
       var url = Uri.parse('http://10.0.2.2:6852/bifrost/sites/create-new-site');
       var siteBody = {
         'site_name': siteName,
@@ -48,7 +48,7 @@ class SiteActions{
       };
       final headers = {
         'Content-Type': 'application/json',
-        'X-User-Id': 'userManager.username',
+        'X-User-Id': userManager.username,
       };
       final response = await http.post(
         url,
@@ -97,4 +97,14 @@ class SiteActions{
     List<String> statuses = jsonDecode(response.body).cast<String>();
     return statuses;
   }
+
+  Future<List<String>> getSiteNames() async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/sites/get-site-names');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<String> siteNames = jsonDecode(response.body).cast<String>();
+    return siteNames;
+  }
+
 }

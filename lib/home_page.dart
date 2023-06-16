@@ -1,6 +1,7 @@
 import 'package:bifrost_ui/Vehicles/vehicle_options_page.dart';
 import 'package:flutter/material.dart';
 
+import 'Assets/asset_options_page.dart';
 import 'Employees/employee_options_page.dart';
 import 'Sites/site_options_page.dart';
 
@@ -51,7 +52,10 @@ class HomePage extends StatelessWidget {
             color: Colors.purple,
             icon: Icons.my_location,
             onTap: () {
-              // Action to perform when 'Assets' button is clicked
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AssetOptionsPage()),
+              );
             },
           ),
           ButtonTile(
