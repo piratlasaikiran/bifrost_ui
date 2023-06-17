@@ -9,12 +9,14 @@ import 'package:http/http.dart' as http;
 class VendorDTO{
   final String? vendorId;
   final String? location;
+  final int? mobileNumber;
   final String? purpose;
   final Map<String, int> commodityCosts;
 
   VendorDTO({
     required this.vendorId,
     required this.location,
+    required this.mobileNumber,
     required this.purpose,
     required this.commodityCosts
   });
@@ -42,6 +44,7 @@ class VendorActions{
 
   Future<bool> saveVendor({
     required String? vendorId,
+    required int? mobileNumber,
     required String? location,
     required String? purpose,
     required File? contractDoc,
@@ -51,6 +54,7 @@ class VendorActions{
     var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/create-new-vendor');
     var formData = {
       'vendor_id': vendorId,
+      'mobile_number': mobileNumber,
       'purpose': purpose,
       'location': location,
       'commodity_costs': selectedCommodities,
@@ -85,6 +89,7 @@ class VendorActions{
       return VendorDTO(
           vendorId: data['vendor_id'] as String?,
           location: data['location'] as String?,
+          mobileNumber: data['mobile_number'] as int?,
           purpose: data['purpose'] as String?,
           commodityCosts: _convertToCommodityCosts(data['commodity_costs']),
       );

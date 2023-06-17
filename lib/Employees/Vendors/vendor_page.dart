@@ -17,6 +17,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
   VendorActions vendorActions = VendorActions();
 
   String? _vendorId;
+  int? _mobileNumber;
   String? _selectedLocation;
   String? _selectedPurpose;
   File? _contractDocument;
@@ -82,6 +83,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
 
       final result = await vendorActions.saveVendor(
           vendorId: _vendorId,
+          mobileNumber: _mobileNumber,
           location: _selectedLocation,
           purpose: _selectedPurpose,
           contractDoc: _contractDocument,
@@ -342,6 +344,25 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
                     return 'Please select a location';
                   }
                   return null;
+                },
+              ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Mobile Number',
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a mobile number';
+                  }
+                  if (value.length != 10 || int.tryParse(value) == null) {
+                    return 'Invalid mobile number';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _mobileNumber = int.parse(value!);
                 },
               ),
               const SizedBox(height: 16.0),

@@ -1,7 +1,6 @@
 import 'package:bifrost_ui/Employees/Vendors/vendor_actions.dart';
 import 'package:flutter/material.dart';
 
-import 'vendor_actions.dart';
 
 class VendorListPage extends StatelessWidget {
   final List<VendorDTO> vendors;
