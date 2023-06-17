@@ -11,7 +11,7 @@ class VehicleTax {
   final File? receipt;
   final DateTime validityStartDate;
   final DateTime validityEndDate;
-  final String taxType;
+  final String? taxType;
 
   VehicleTax({
     required this.amount,
@@ -336,21 +336,28 @@ class AddVehicleTaxDialog extends StatefulWidget {
 
 class _AddVehicleTaxDialogState extends State<AddVehicleTaxDialog> {
 
-  static const List<String> taxTypes = [
-    'PUC',
-    'FITNESS',
-    'PERMIT',
-    'INSURANCE',
-    'TAX',
-    'OTHERS',
-  ];
+  List<String> _taxTypes = [];
+  VehicleActions vehicleActions = VehicleActions();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchVehicleTaxTypesList();
+  }
+
+  void _fetchVehicleTaxTypesList() async {
+    final taxTypes = await vehicleActions.getVehicleTaxTypes();
+    setState(() {
+      _taxTypes = taxTypes;
+    });
+  }
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late int _amount;
   late File? _receipt = null;
   DateTime? _validityStartDate;
   DateTime? _validityEndDate;
-  late String _selectedTaxType = taxTypes[5];
+  String? _selectedTaxType;
 
 
 
@@ -527,7 +534,7 @@ class _AddVehicleTaxDialogState extends State<AddVehicleTaxDialog> {
                           _selectedTaxType = newValue!;
                         });
                       },
-                      items: taxTypes.map((String taxType) {
+                      items: _taxTypes.map((String taxType) {
                         return DropdownMenuItem<String>(
                           value: taxType,
                           child: Text(taxType),

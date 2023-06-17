@@ -36,7 +36,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
     _fetchCommodityBaseUnits();
   }
 
-  Future<void> _fetchLocationList() async {
+  void _fetchLocationList() async {
     SiteActions siteActions = SiteActions();
     final locations = await siteActions.getSiteNames();
     setState(() {
