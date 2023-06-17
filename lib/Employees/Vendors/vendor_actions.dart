@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:http_parser/http_parser.dart';
+
 import '../../Utils/user_manager.dart';
 
 import 'package:http/http.dart' as http;
@@ -32,6 +34,31 @@ class VendorActions{
     required File? contractDoc,
     required Map<String, int> selectedCommodities,
   }) async {
-    return true;
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/create-new-vendor');
+    var formData = {
+      'vendor_id': vendorId,
+      'purpose': purpose,
+      'location': location,
+      'commodity_costs': selectedCommodities,
+    };
+    var jsonPart = http.MultipartFile.fromString(
+      'createVendorPayLoad',
+      jsonEncode(formData),
+      contentType: MediaType('application', 'json'),
+    );
+    var request = http.MultipartRequest('POST', url);
+    var imageField = await http.MultipartFile.fromPath('contractDocument', contractDoc!.path);
+
+    request.headers['X-User-Id'] = userManager.username;
+    request.files.add(jsonPart);
+    request.files.add(imageField);
+
+    var response = await request.send();
+    if(response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

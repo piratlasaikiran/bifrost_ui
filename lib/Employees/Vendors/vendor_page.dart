@@ -15,6 +15,7 @@ class VendorInputDialog extends StatefulWidget {
 class _VendorInputDialogState extends State<VendorInputDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   VendorActions vendorActions = VendorActions();
+
   String? _vendorId;
   String? _selectedLocation;
   String? _selectedPurpose;
@@ -56,15 +57,78 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
     });
   }
 
-  void _saveVendorDetails() {
+  Future<void> _saveVendor() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      final result = vendorActions.saveVendor(
+
+      if (_contractDocument == null) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('ContractDoc Upload'),
+              content: const Text('Please Upload Contract Document.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+
+      final result = await vendorActions.saveVendor(
           vendorId: _vendorId,
           location: _selectedLocation,
           purpose: _selectedPurpose,
           contractDoc: _contractDocument,
           selectedCommodities: _selectedCommodities);
+      if (result) {
+        // Show success popup
+        Future.microtask(() {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Success'),
+                content: const Text('Supervisor saved successfully.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        });
+      } else {
+        Future.microtask(() {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Failure'),
+                content: const Text('Failed to save supervisor.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        });
+      }
     }
   }
 
@@ -305,7 +369,6 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
               const SizedBox(height: 16.0),
               _buildContractDocumentWidget(),
 
-              //**//
               const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: _addCommodityRate,
@@ -330,7 +393,6 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
                     );
                   }).toList(),
                 ),
-              //**//
             ],
           ),
         ),
@@ -343,7 +405,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
           child: const Text('Cancel'),
         ),
         ElevatedButton(
-          onPressed: _saveVendorDetails,
+          onPressed: _saveVendor,
           child: const Text('Save'),
         ),
       ],
