@@ -6,6 +6,19 @@ import '../../Utils/user_manager.dart';
 
 import 'package:http/http.dart' as http;
 
+class VendorDTO{
+  final String? vendorId;
+  final String? location;
+  final String? purpose;
+  final Map<String, int> commodityCosts;
+
+  VendorDTO({
+    required this.vendorId,
+    required this.location,
+    required this.purpose,
+    required this.commodityCosts
+  });
+}
 
 class VendorActions{
   Future<List<String>> getVendorPurposes() async {
@@ -60,5 +73,34 @@ class VendorActions{
     } else {
       return false;
     }
+  }
+
+  Future<List<VendorDTO>> getAllVendors() async{
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<dynamic> vendorDTOs = jsonDecode(response.body);
+    final List<VendorDTO> drivers = vendorDTOs.map((data) {
+      return VendorDTO(
+          vendorId: data['vendor_id'] as String?,
+          location: data['location'] as String?,
+          purpose: data['purpose'] as String?,
+          commodityCosts: _convertToCommodityCosts(data['commodity_costs']),
+      );
+    }).toList();
+    return drivers;
+  }
+
+  Map<String, int> _convertToCommodityCosts(Map<String, dynamic>? rawCommodityCosts) {
+    Map<String, int> commodityCosts = {};
+    if (rawCommodityCosts != null) {
+      rawCommodityCosts.forEach((key, value) {
+        if (value is int) {
+          commodityCosts[key] = value;
+        }
+      });
+    }
+    return commodityCosts;
   }
 }

@@ -1,10 +1,12 @@
 import 'package:bifrost_ui/Employees/Driver/driver_actions.dart';
+import 'package:bifrost_ui/Employees/Vendors/vendor_actions.dart';
 import 'package:flutter/material.dart';
 
 
 import 'Driver/driver_list_page.dart';
 import 'Supervisor/supervisor_actions.dart';
 import 'Supervisor/supervisor_list_page.dart';
+import 'Vendors/vendor_list_page.dart';
 
 
 class SelectEmployeeTypeForViewDialog extends StatefulWidget {
@@ -49,7 +51,16 @@ class _SelectEmployeeTypeForViewDialogState extends State<SelectEmployeeTypeForV
         );
       });
     } else if (option == 'Vendor') {
-      // Action for Vendor option
+      VendorActions vendorActions = VendorActions();
+      List<VendorDTO> vendorDTOs = await vendorActions.getAllVendors();
+      Future.microtask(() {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VendorListPage(vendors: vendorDTOs),
+          ),
+        );
+      });
     }
   }
 
