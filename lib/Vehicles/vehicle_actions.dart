@@ -82,7 +82,7 @@ class VehicleActions{
     List<VehicleTaxRequest> vehicleTaxDetails = [];
     for (var vehicleTax in vehicleTaxes) {
       VehicleTaxRequest vehicleTaxRequest = VehicleTaxRequest();
-      vehicleTaxRequest.tax_type = vehicleTax.taxType;
+      vehicleTaxRequest.tax_type = vehicleTax.taxType!;
       vehicleTaxRequest.renewal_amount = vehicleTax.amount;
       vehicleTaxRequest.validity_start = '${vehicleTax.validityStartDate.year}-${vehicleTax.validityStartDate.month.toString().padLeft(2, '0')}-${vehicleTax.validityStartDate.day.toString().padLeft(2, '0')}';
       vehicleTaxRequest.validity_end = '${vehicleTax.validityEndDate.year}-${vehicleTax.validityEndDate.month.toString().padLeft(2, '0')}-${vehicleTax.validityEndDate.day.toString().padLeft(2, '0')}';
@@ -144,5 +144,14 @@ class VehicleActions{
     var response = await http.get(url, headers: headers);
     List<String> vehicleNumbers = jsonDecode(response.body).cast<String>();
     return vehicleNumbers;
+  }
+
+  Future<List<String>> getVehicleTaxTypes() async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/tax-types');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<String> vehicleTaxTypes = jsonDecode(response.body).cast<String>();
+    return vehicleTaxTypes;
   }
 }

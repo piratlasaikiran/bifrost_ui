@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'Driver/driver_page.dart';
 import 'Supervisor/supervisor_page.dart';
+import 'Vendors/vendor_page.dart';
 
 class SelectEmployeeTypeForCreationDialog extends StatefulWidget {
   const SelectEmployeeTypeForCreationDialog({super.key});
@@ -36,7 +37,12 @@ class _SelectEmployeeTypeForCreationDialogState extends State<SelectEmployeeType
         },
       );
     } else if (option == 'Vendor') {
-      // Action for Vendor option
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return const VendorInputDialog();
+        },
+      );
     }
   }
 
