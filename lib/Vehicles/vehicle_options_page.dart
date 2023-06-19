@@ -1,3 +1,4 @@
+import 'package:bifrost_ui/Vehicles/upload_vehicle_tax_dialog.dart';
 import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
 import 'package:bifrost_ui/Vehicles/vehicle_list_page.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,12 @@ class VehicleOptionsPage extends StatelessWidget {
               icon: Icons.upload_file,
               label: 'Upload Tax Receipt',
               onTap: () {
-                // Action to perform when 'Upload Tax Receipt' button is clicked
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return const UploadVehicleTaxDialog();
+                  },
+                );
               },
             ),
             const SizedBox(height: 16.0),

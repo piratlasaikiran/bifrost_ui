@@ -150,17 +150,23 @@ class _AssetListPageState extends State<AssetListPage> {
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
-              if (value == 'add_asset') {
+              if (value == 'add_asset_location') {
                 showAddAssetLocationPopup();
-              } else if (value == 'reset_filters') {
+              } else if (value == 'add_asset_ownership') {
+                // Implement asset ownership pop up
+              }else if (value == 'reset_filters') {
                 resetFilters();
               }
             },
             itemBuilder: (context) {
               return [
                 const PopupMenuItem<String>(
-                  value: 'add_asset',
+                  value: 'add_asset_location',
                   child: Text('Add Asset Location'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'add_asset_ownership',
+                  child: Text('Add Asset Ownership'),
                 ),
                 const PopupMenuItem<String>(
                   value: 'reset_filters',
