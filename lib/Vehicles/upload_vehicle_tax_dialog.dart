@@ -4,6 +4,7 @@ import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class UploadVehicleTaxDialog extends StatefulWidget {
   const UploadVehicleTaxDialog({super.key});
@@ -18,6 +19,7 @@ class _UploadVehicleTaxDialogState extends State<UploadVehicleTaxDialog> {
   List<String> _taxTypes = [];
   List<String> _vehicles = [];
   VehicleActions vehicleActions = VehicleActions();
+  final _vehicleNumberController = TextEditingController();
 
   @override
   void initState() {
@@ -30,7 +32,14 @@ class _UploadVehicleTaxDialogState extends State<UploadVehicleTaxDialog> {
     final vehicles = await vehicleActions.getVehicleNumbers();
     setState(() {
       _vehicles = vehicles;
+      _vehicleNumberController.text = _selectedVehicle ?? '';
     });
+  }
+
+  @override
+  void dispose() {
+    _vehicleNumberController.dispose();
+    super.dispose();
   }
 
   void _fetchVehicleTaxTypesList() async {
@@ -252,21 +261,50 @@ class _UploadVehicleTaxDialogState extends State<UploadVehicleTaxDialog> {
                 child: Row(
                   children: [
                     const Text('Vehicle Number'),
-                    const SizedBox(width: 15),
-                    DropdownButton<String>(
-                      value: _selectedVehicle,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedVehicle = newValue!;
-                        });
-                      },
-                      items: _vehicles.map((String taxType) {
-                        return DropdownMenuItem<String>(
-                          value: taxType,
-                          child: Text(taxType),
-                        );
-                      }).toList(),
-                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TypeAheadFormField<String>(
+                        key: const Key('Vehicle Number'),
+                        textFieldConfiguration: TextFieldConfiguration(
+                          controller: _vehicleNumberController,
+                          decoration: const InputDecoration(
+                            hintText: 'Vehicle Number',
+                            hintStyle: TextStyle(fontSize: 14),
+                            prefixIcon: Icon(Icons.search),
+                          ),
+                        ),
+                        suggestionsCallback: (String pattern) {
+                          if (pattern.isEmpty) {
+                            return _vehicles;
+                          } else {
+                            final filteredList = _vehicles
+                                .where((vehicle) => vehicle.toLowerCase().contains(pattern.toLowerCase()))
+                                .toList();
+                            return filteredList;
+                          }
+                        },
+                        itemBuilder: (BuildContext context, String suggestion) {
+                          return ListTile(
+                            title: Text(suggestion),
+                          );
+                        },
+                        onSuggestionSelected: (String suggestion) {
+                          setState(() {
+                            _selectedVehicle = suggestion;
+                            _vehicleNumberController.text = suggestion;
+                          });
+                        },
+                        validator: (String? value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select a vehicle number';
+                          }
+                          return null;
+                        },
+                        onSaved: (String? value) {
+                          _selectedVehicle = value;
+                        },
+                      ),
+                    )
                   ],
                 ),
               ),
