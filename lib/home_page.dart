@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'Assets/asset_options_page.dart';
 import 'Employees/employee_options_page.dart';
 import 'Sites/site_options_page.dart';
+import 'Transactions/transactions_options_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -44,7 +45,10 @@ class HomePage extends StatelessWidget {
             color: Colors.green,
             icon: Icons.attach_money,
             onTap: () {
-              // Action to perform when 'Transactions' button is clicked
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const TransactionsOptionsPage()),
+              );
             },
           ),
           ButtonTile(

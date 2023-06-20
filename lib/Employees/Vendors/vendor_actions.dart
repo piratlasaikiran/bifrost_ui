@@ -108,4 +108,13 @@ class VendorActions{
     }
     return commodityCosts;
   }
+
+  Future<List<String>> getVendorIds() async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/ids');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<String> vendorIds = jsonDecode(response.body).cast<String>();
+    return vendorIds;
+  }
 }
