@@ -49,6 +49,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     _fetchBankAccounts();
     _fetchSources();
     _fetchDestinations();
+    _selectedBankAccount = 'My Account';
   }
 
   void _fetchTransactionPurposes() async {
@@ -115,9 +116,46 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
           remarks: _remarks);
 
       if(result){
-
-      }else{
-
+        Future.microtask(() {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Success'),
+                content: const Text('Transaction saved successfully.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        });
+      } else {
+        Future.microtask(() {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Failure'),
+                content: const Text('Failed to save transaction.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        });
       }
     }
   }

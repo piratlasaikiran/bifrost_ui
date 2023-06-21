@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:http_parser/http_parser.dart';
+
 import '../Utils/user_manager.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,8 +18,38 @@ class TransactionActions{
     required DateTime? transactionDate,
     required String? remarks
   }) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/create-new-transaction');
+    var formData = {
+      'source': source,
+      'destination': destination,
+      'amount': amount,
+      'purpose': purpose,
+      'remarks': remarks,
+      'transaction_date': '${transactionDate!.year}-${transactionDate.month.toString().padLeft(2, '0')}-${transactionDate.day.toString().padLeft(2, '0')}',
+      'mode': mode,
+      'bank_account': bankAccount
+    };
+    var jsonPart = http.MultipartFile.fromString(
+      'createTransactionPayload',
+      jsonEncode(formData),
+      contentType: MediaType('application', 'json'),
+    );
+    var request = http.MultipartRequest('POST', url);
+    if(bill != null){
+      var billField = await http.MultipartFile.fromPath('bill', bill!.path);
+      request.files.add(billField);
+    }
 
-    return true;
+    request.headers['X-User-Id'] = userManager.username;
+    request.files.add(jsonPart);
+
+    var response = await request.send();
+    if(response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
 
   }
 
