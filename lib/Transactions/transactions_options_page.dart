@@ -1,3 +1,5 @@
+import 'package:bifrost_ui/Transactions/transaction_actions.dart';
+import 'package:bifrost_ui/Transactions/transactions_list_page.dart';
 import 'package:flutter/material.dart';
 
 import 'add_transaction_dialog.dart';
@@ -33,8 +35,17 @@ class TransactionsOptionsPage extends StatelessWidget {
             _buildCircularButton(
               icon: Icons.list,
               label: 'Manage \nTransactions',
-              onTap: () {
-                // perform action when pending balance is clicked
+              onTap: () async{
+                TransactionActions transactionActions = TransactionActions();
+                List<TransactionDTO> transactionDTOs = await transactionActions.getAllTransactions();
+                Future.microtask(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TransactionListPage(transactions: transactionDTOs),
+                    ),
+                  );
+                });
               },
               color: Colors.blue,
               borderColor: Colors.white,

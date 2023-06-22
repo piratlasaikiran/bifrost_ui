@@ -5,6 +5,30 @@ import 'package:http_parser/http_parser.dart';
 import '../Utils/user_manager.dart';
 import 'package:http/http.dart' as http;
 
+class TransactionDTO{
+  final String source;
+  final String destination;
+  final int amount;
+  final String purpose;
+  final String remarks;
+  final DateTime? transactionDate;
+  final String status;
+  final String mode;
+  final String bankAccount;
+
+  TransactionDTO({
+    required this.source,
+    required this.destination,
+    required this.amount,
+    required this.purpose,
+    required this.remarks,
+    required this.transactionDate,
+    required this.status,
+    required this.mode,
+    required this.bankAccount
+  });
+}
+
 
 class TransactionActions{
   Future<bool> saveTransaction({
@@ -51,6 +75,36 @@ class TransactionActions{
       return false;
     }
 
+  }
+
+  Future<List<TransactionDTO>> getAllTransactions() async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<dynamic> transactionDTOs = jsonDecode(response.body);
+    List<TransactionDTO> transactions = [];
+    transactions.add(TransactionDTO(source: "Jaswanth", destination: "SaiKiran", amount: 1000, purpose: "BETA", remarks: "Testing", transactionDate: DateTime.now(), status: "REJECTED", mode: "UPI", bankAccount: "My HDFC"));
+    transactions.add(TransactionDTO(source: "SaiKiran", destination: "Venkat", amount: 1000, purpose: "SALARY", remarks: "TestRemarks", transactionDate: DateTime.now(), status: "CHECKED", mode: "UPI", bankAccount: "My HDFC"));
+    transactions.add(TransactionDTO(source: "source", destination: "destination", amount: 100, purpose: "purpose", remarks: "remarks", transactionDate: DateTime.now(), status: "SUBMITTED", mode: "CASH", bankAccount: "My Account"));
+    return transactions;
+    // final List<TransactionDTO> transactions = transactionDTOs.map((data) {
+      // final processedTransactionDate = data['transaction_date'] is String
+      //     ? DateTime.parse(data['transaction_date'] as String)
+      //     : null;
+    //   return TransactionDTO(
+    //     source: data['source'] as String,
+    //     destination: data['destination'] as String,
+    //     amount: data['amount'] as int,
+    //     purpose: data['purpose'] as String,
+    //     remarks: data['remarks'] as String,
+    //     status: data['status'] as String,
+    //     mode: data['mode'] as String,
+    //     bankAccount: data['bank_account'] as String,
+    //     transactionDate: null,
+    //   );
+    // }).toList();
+    // return transactions;
   }
 
   Future<List<String>> getModes() async {
