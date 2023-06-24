@@ -75,7 +75,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     });
   }
 
-  //ToDo: check and all remaining type of sources for transactions
   void _fetchSources() async {
     SupervisorActions supervisorActions = SupervisorActions();
     final supervisors = await supervisorActions.getSupervisorNames();
