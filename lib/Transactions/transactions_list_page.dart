@@ -115,7 +115,7 @@ class _TransactionListPageState extends State<TransactionListPage> {
         final isStatusMatch = selectedStatues.isEmpty ||
             selectedStatues.contains(transaction.status.toLowerCase());
         final isBankAccountMatch = selectedBankAccounts.isEmpty ||
-            selectedBankAccounts.contains(transaction.bankAccount.toLowerCase());
+            selectedBankAccounts.contains(transaction.bankAccount!.toLowerCase());
         final isPurposeMatch = selectedPurposes.isEmpty ||
             selectedPurposes.contains(transaction.purpose.toLowerCase());
         final isTransactionStartDateMatch =
