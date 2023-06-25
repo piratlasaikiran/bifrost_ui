@@ -18,8 +18,8 @@ class _VendorAttendanceInputDialogState
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   VendorActions vendorActions = VendorActions();
 
-  bool makeTransaction = false;
-  bool showBankAccountName = false;
+  bool makeTransaction = true;
+  bool showBankAccountName = true;
   String? _selectedVendorId;
   String? _selectedSite;
   String? _selectedBankAccount;
@@ -93,7 +93,7 @@ class _VendorAttendanceInputDialogState
     }
   }
 
-  Future<void> _saveAttendance() async {
+  Future<void> _enterVendorAttendance() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -113,7 +113,7 @@ class _VendorAttendanceInputDialogState
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Success'),
-                content: const Text('Site saved successfully.'),
+                content: const Text('Vendor Attendance Entered Successfully.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -134,7 +134,7 @@ class _VendorAttendanceInputDialogState
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Failure'),
-                content: const Text('Failed to save site.'),
+                content: const Text('Failed to enter vendor attendance.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -383,12 +383,6 @@ class _VendorAttendanceInputDialogState
                     );
                   }).toList(),
                   decoration: const InputDecoration(labelText: 'Bank Account'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select a bank account';
-                    }
-                    return null;
-                  },
                 ),
               const SizedBox(height: 8.0),
               Row(
@@ -430,7 +424,7 @@ class _VendorAttendanceInputDialogState
         ),
         ElevatedButton(
           onPressed: () {
-            _saveAttendance();
+            _enterVendorAttendance();
           },
           child: const Text('Save'),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'EmployeeAttendance/employee_attendance_input_dialog.dart';
 import 'VendorAttendance/vendor_attendance_input_dialog.dart';
 
 class SelectAttendanceTypeDialog extends StatefulWidget {
@@ -27,13 +28,13 @@ class _SelectAttendanceTypeDialog extends State<SelectAttendanceTypeDialog> {
           return const VendorAttendanceInputDialog();
         },
       );
-    } else if (option == 'Driver') {
-      // showDialog(
-      //   context: context,
-      //   builder: (BuildContext context) {
-      //     return const EmployeeAttendanceInputDialog();
-      //   },
-      // );
+    } else if (option == 'Employee') {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return const EmployeeAttendanceInputDialog();
+        },
+      );
     }
   }
 
