@@ -41,6 +41,15 @@ class VendorActions{
     return decodedData;
   }
 
+  Future<Map<String, String>> getCommodityAttendanceUnits(String vendorId) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/$vendorId/get-commodity-attendance-units');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    Map<String, String> decodedData = Map<String, String>.from(jsonDecode(response.body));
+    return decodedData;
+  }
+
 
   Future<bool> saveVendor({
     required String? vendorId,
