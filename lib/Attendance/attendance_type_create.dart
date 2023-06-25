@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'EmployeeAttendance/employee_attendance_input_dialog.dart';
 import 'VendorAttendance/vendor_attendance_input_dialog.dart';
 
-class SelectAttendanceTypeDialog extends StatefulWidget {
-  const SelectAttendanceTypeDialog({super.key});
+class SelectAttendanceTypeForCreationDialog extends StatefulWidget {
+  const SelectAttendanceTypeForCreationDialog({super.key});
 
 
   @override
-  _SelectAttendanceTypeDialog createState() =>
-      _SelectAttendanceTypeDialog();
+  _SelectAttendanceTypeForCreationDialog createState() =>
+      _SelectAttendanceTypeForCreationDialog();
 }
 
-class _SelectAttendanceTypeDialog extends State<SelectAttendanceTypeDialog> {
+class _SelectAttendanceTypeForCreationDialog extends State<SelectAttendanceTypeForCreationDialog> {
   String? selectedOption;
 
   void selectOption(String? option) {

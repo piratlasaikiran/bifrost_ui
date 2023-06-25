@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'attendance_type.dart';
+import 'attendance_type_create.dart';
+import 'attendance_type_view.dart';
 
 class AttendanceOptionsPage extends StatelessWidget {
   const AttendanceOptionsPage({super.key});
@@ -23,7 +24,7 @@ class AttendanceOptionsPage extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return const SelectAttendanceTypeDialog();
+                    return const SelectAttendanceTypeForCreationDialog();
                   },
                 );
               },
@@ -32,7 +33,13 @@ class AttendanceOptionsPage extends StatelessWidget {
             _buildCircularButton(
               icon: Icons.list_alt,
               label: 'View Attendance',
-              onTap: () async {
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return const SelectAttendanceTypeForViewDialog();
+                  },
+                );
               },
             ),
           ],
