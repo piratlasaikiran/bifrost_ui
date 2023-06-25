@@ -1,20 +1,17 @@
-import 'package:bifrost_ui/Vehicles/upload_vehicle_tax_dialog.dart';
-import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
-import 'package:bifrost_ui/Vehicles/vehicle_list_page.dart';
+import 'package:bifrost_ui/Transactions/transaction_actions.dart';
+import 'package:bifrost_ui/Transactions/transactions_list_page.dart';
 import 'package:flutter/material.dart';
 
-import 'add_vehicle_dialog.dart';
+import 'add_transaction_dialog.dart';
 
-class VehicleOptionsPage extends StatelessWidget {
-  const VehicleOptionsPage({super.key});
-
+class TransactionsOptionsPage extends StatelessWidget {
+  const TransactionsOptionsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Vehicle Actions'),
+        title: const Text('Transaction Options'),
       ),
       body: Center(
         child: Column(
@@ -22,46 +19,38 @@ class VehicleOptionsPage extends StatelessWidget {
           children: [
             _buildCircularButton(
               icon: Icons.add,
-              label: 'Add Vehicle',
+              label: 'Add Transaction',
               onTap: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return const AddVehicleDialog();
+                    return const AddTransactionDialog();
                   },
                 );
               },
+              color: Colors.blue,
+              borderColor: Colors.white,
             ),
             const SizedBox(height: 16.0),
             _buildCircularButton(
-              icon: Icons.upload_file,
-              label: 'Upload Tax Receipt',
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return const UploadVehicleTaxDialog();
-                  },
-                );
-              },
-            ),
-            const SizedBox(height: 16.0),
-            _buildCircularButton(
-              icon: Icons.car_rental,
-              label: 'View Vehicles',
-              onTap: () async {
-                VehicleActions vehicleActions = VehicleActions();
-                List<VehicleDTO> vehicleDTOs = await vehicleActions.getAllVehicles();
+              icon: Icons.list,
+              label: 'Manage \nTransactions',
+              onTap: () async{
+                TransactionActions transactionActions = TransactionActions();
+                List<TransactionDTO> transactionDTOs = await transactionActions.getAllTransactions();
                 Future.microtask(() {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => VehicleListPage(vehicles: vehicleDTOs),
+                      builder: (context) => TransactionListPage(transactions: transactionDTOs),
                     ),
                   );
                 });
               },
+              color: Colors.blue,
+              borderColor: Colors.white,
             ),
+            const SizedBox(height: 16.0),
           ],
         ),
       ),
@@ -72,15 +61,18 @@ class VehicleOptionsPage extends StatelessWidget {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
+    required Color color,
+    required Color borderColor,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 180.0,
         height: 180.0,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.blue,
+          color: color,
+          border: Border.all(color: borderColor, width: 2.0),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

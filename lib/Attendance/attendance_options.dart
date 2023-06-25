@@ -1,20 +1,16 @@
-import 'package:bifrost_ui/Vehicles/upload_vehicle_tax_dialog.dart';
-import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
-import 'package:bifrost_ui/Vehicles/vehicle_list_page.dart';
 import 'package:flutter/material.dart';
 
-import 'add_vehicle_dialog.dart';
+import 'attendance_type.dart';
 
-class VehicleOptionsPage extends StatelessWidget {
-  const VehicleOptionsPage({super.key});
-
+class AttendanceOptionsPage extends StatelessWidget {
+  const AttendanceOptionsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Vehicle Actions'),
+        title: const Text('Attendance Actions'),
       ),
       body: Center(
         child: Column(
@@ -22,44 +18,21 @@ class VehicleOptionsPage extends StatelessWidget {
           children: [
             _buildCircularButton(
               icon: Icons.add,
-              label: 'Add Vehicle',
+              label: 'Enter Attendance',
               onTap: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return const AddVehicleDialog();
+                    return const SelectAttendanceTypeDialog();
                   },
                 );
               },
             ),
             const SizedBox(height: 16.0),
             _buildCircularButton(
-              icon: Icons.upload_file,
-              label: 'Upload Tax Receipt',
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return const UploadVehicleTaxDialog();
-                  },
-                );
-              },
-            ),
-            const SizedBox(height: 16.0),
-            _buildCircularButton(
-              icon: Icons.car_rental,
-              label: 'View Vehicles',
+              icon: Icons.list_alt,
+              label: 'View Attendance',
               onTap: () async {
-                VehicleActions vehicleActions = VehicleActions();
-                List<VehicleDTO> vehicleDTOs = await vehicleActions.getAllVehicles();
-                Future.microtask(() {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => VehicleListPage(vehicles: vehicleDTOs),
-                    ),
-                  );
-                });
               },
             ),
           ],

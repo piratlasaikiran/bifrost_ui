@@ -104,4 +104,13 @@ class DriverActions {
     // Use the provided parameters for updating supervisor data
     // Example: API calls, database operations, etc.
   }
+
+  Future<List<String>> getDriverNames() async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/drivers/names');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<String> driverNames = jsonDecode(response.body).cast<String>();
+    return driverNames;
+  }
 }

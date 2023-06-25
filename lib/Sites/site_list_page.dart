@@ -44,11 +44,17 @@ class SiteTile extends StatelessWidget {
             const PopupMenuItem(
               value: 'view_edit',
               child: Text('View & Edit'),
+            ),
+            const PopupMenuItem(
+              value: 'add_attendance',
+              child: Text('Enter Attendance'),
             )
           ];
         },
         onSelected: (value) {
           if (value == 'view_edit') {
+            // Perform action for View & Edit
+          }else if (value == 'add_attendance') {
             // Perform action for View & Edit
           }
         },

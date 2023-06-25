@@ -11,7 +11,7 @@ class VehicleListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Supervisors'),
+        title: const Text('Vehicles'),
       ),
       body: ListView.separated(
         itemCount: vehicles.length,

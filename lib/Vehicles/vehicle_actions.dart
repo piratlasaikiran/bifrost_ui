@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:bifrost_ui/Vehicles/vehicle_tax.dart';
 import 'package:http/http.dart' as http;
@@ -153,5 +154,41 @@ class VehicleActions{
     var response = await http.get(url, headers: headers);
     List<String> vehicleTaxTypes = jsonDecode(response.body).cast<String>();
     return vehicleTaxTypes;
+  }
+
+  Future<bool> uploadVehicleTax({
+    required int? amount,
+    required String? vehicleNumber,
+    required String? taxType,
+    required DateTime? validityStartDate,
+    required DateTime? validityEndDate,
+    required File? receipt,
+  }) async{
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/$vehicleNumber/upload-new-vehicle-tax');
+    var formData = {
+      'tax_type': taxType,
+      'renewal_amount': amount,
+      'validity_start': '${validityStartDate?.year}-${validityStartDate?.month.toString().padLeft(2, '0')}-${validityStartDate?.day.toString().padLeft(2, '0')}',
+      'validity_end': '${validityEndDate?.year}-${validityEndDate?.month.toString().padLeft(2, '0')}-${validityEndDate?.day.toString().padLeft(2, '0')}',
+    };
+    var jsonPart = http.MultipartFile.fromString(
+      'vehicleTax',
+      jsonEncode(formData),
+      contentType: MediaType('application', 'json'),
+    );
+    var request = http.MultipartRequest('POST', url);
+    request.headers['X-User-Id'] = userManager.username;
+    var imageField = await http.MultipartFile.fromPath('taxReceipt', receipt!.path);
+
+    request.files.add(jsonPart);
+    request.files.add(imageField);
+
+    var response = await request.send();
+    if(response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

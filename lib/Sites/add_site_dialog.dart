@@ -91,7 +91,7 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
               TextFormField(
                 controller: _siteAddressController,
                 decoration: const InputDecoration(
-                  labelText: 'Site Address Number',
+                  labelText: 'Site Address',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -227,12 +227,9 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
   }
 
   Future<void> _saveSiteData() async {
-    final siteName = _siteNameController.text;
-    final siteAddress = _siteAddressController.text;
-    final siteStatus = _selectedStatus;
 
     SiteActions siteActions = SiteActions();
-    final result = await siteActions.saveSite(siteName: siteName,
+    final result = await siteActions.saveSite(siteName: _siteName,
         address: _siteAddress,
         siteStatus: _selectedStatus!,
         vehicles: _selectedVehicles,

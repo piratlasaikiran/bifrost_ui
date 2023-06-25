@@ -2,8 +2,10 @@ import 'package:bifrost_ui/Vehicles/vehicle_options_page.dart';
 import 'package:flutter/material.dart';
 
 import 'Assets/asset_options_page.dart';
+import 'Attendance/attendance_options.dart';
 import 'Employees/employee_options_page.dart';
 import 'Sites/site_options_page.dart';
+import 'Transactions/transactions_options_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -30,7 +32,7 @@ class HomePage extends StatelessWidget {
           ),
           ButtonTile(
             title: 'Sites',
-            color: Colors.orange,
+            color: Colors.green,
             icon: Icons.location_on,
             onTap: () {
               Navigator.push(
@@ -41,10 +43,13 @@ class HomePage extends StatelessWidget {
           ),
           ButtonTile(
             title: 'Transactions',
-            color: Colors.green,
+            color: Colors.orange,
             icon: Icons.attach_money,
             onTap: () {
-              // Action to perform when 'Transactions' button is clicked
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const TransactionsOptionsPage()),
+              );
             },
           ),
           ButtonTile(
@@ -66,6 +71,17 @@ class HomePage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const VehicleOptionsPage()),
+              );
+            },
+          ),
+          ButtonTile(
+            title: 'Attendance',
+            color: Colors.teal, // Adjust color as per your preference
+            icon: Icons.checklist_rtl_rounded, // Icon for Vehicles
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AttendanceOptionsPage()),
               );
             },
           ),
