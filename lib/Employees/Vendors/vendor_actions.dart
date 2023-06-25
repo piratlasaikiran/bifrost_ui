@@ -23,6 +23,43 @@ class VendorDTO{
 }
 
 class VendorActions{
+
+  Future<bool> saveAttendance({
+    required String vendorId,
+    required String site,
+    required Map<String, double> commodityAttendance,
+    required DateTime attendanceDate,
+    required bool makeTransaction,
+    required String? bankAccount,
+  }) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendor-attendance/enter-attendance');
+    var attendanceBody = {
+      'site': site,
+      'vendor_id': vendorId,
+      'entered_by': userManager.username,
+      'attendance_date': '${attendanceDate.year}-${attendanceDate.month.toString().padLeft(2, '0')}-${attendanceDate.day.toString().padLeft(2, '0')}',
+      'commodity_attendance': commodityAttendance,
+      'make_transaction': makeTransaction,
+      'bank_account': bankAccount
+    };
+    final headers = {
+      'Content-Type': 'application/json',
+      'X-User-Id': userManager.username,
+    };
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode(attendanceBody),
+    );
+
+    if(response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+}
+
   Future<List<String>> getVendorPurposes() async {
     UserManager userManager = UserManager();
     var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/get-vendor-purposes');

@@ -96,6 +96,59 @@ class _VendorAttendanceInputDialogState
   Future<void> _saveAttendance() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      final result = await vendorActions.saveAttendance(
+          vendorId: _selectedVendorId!,
+          site: _selectedSite!,
+          commodityAttendance: commodityAttendance,
+          attendanceDate: attendanceDate!,
+          makeTransaction: makeTransaction,
+          bankAccount: _selectedBankAccount);
+
+      if (result) {
+        // Show success popup
+        Future.microtask(() {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Success'),
+                content: const Text('Site saved successfully.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        });
+      } else {
+        Future.microtask(() {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Failure'),
+                content: const Text('Failed to save site.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        });
+      }
+
     }
   }
 
