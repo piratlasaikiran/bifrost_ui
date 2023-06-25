@@ -176,6 +176,64 @@ class _VendorAttendanceInputDialogState
                   ],
                 ),
               ),
+              if(_selectedVendorId != null)
+                ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => CommodityAttendanceDialog(
+                        vendorId: _selectedVendorId!,
+                        onValuesChanged: (values) {
+                          setState(() {
+                            commodityAttendance = values;
+                          });
+                        },
+                        initialValues: commodityAttendance.isNotEmpty ? Map<String, double>.from(commodityAttendance) : null,
+                      ),
+                    );
+                  },
+                  child: const Text('Commodity Attendance'),
+                ),
+                if (commodityAttendance.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16.0),
+                      const Text(
+                        'Commodity Attendance:',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Wrap(
+                        spacing: 4.0,
+                        runSpacing: 4.0,
+                        children: [
+                          for (int i = 0; i < commodityAttendance.length; i += 2)
+                            Row(
+                              children: [
+                                if (i < commodityAttendance.length)
+                                  Chip(
+                                    label: Text(
+                                      '${commodityAttendance.entries.elementAt(i).key}: ${commodityAttendance.entries.elementAt(i).value.toStringAsFixed(2)}',
+                                      style: const TextStyle(fontSize: 8.0),
+                                    ),
+                                  ),
+                                if (i + 1 < commodityAttendance.length)
+                                  Chip(
+                                    label: Text(
+                                      '${commodityAttendance.entries.elementAt(i + 1).key}: ${commodityAttendance.entries.elementAt(i + 1).value.toStringAsFixed(2)}',
+                                      style: const TextStyle(fontSize: 8.0),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Row(
@@ -243,63 +301,6 @@ class _VendorAttendanceInputDialogState
                   ],
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => CommodityAttendanceDialog(
-                      vendorId: _selectedVendorId!,
-                      onValuesChanged: (values) {
-                        setState(() {
-                          commodityAttendance = values;
-                        });
-                      },
-                      initialValues: commodityAttendance.isNotEmpty ? Map<String, double>.from(commodityAttendance) : null,
-                    ),
-                  );
-                },
-                child: const Text('Commodity Attendance'),
-              ),
-              if (commodityAttendance.isNotEmpty)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 16.0),
-                    const Text(
-                      'Commodity Attendance:',
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Wrap(
-                      spacing: 4.0,
-                      runSpacing: 4.0,
-                      children: [
-                        for (int i = 0; i < commodityAttendance.length; i += 2)
-                          Row(
-                            children: [
-                              if (i < commodityAttendance.length)
-                                Chip(
-                                  label: Text(
-                                    '${commodityAttendance.entries.elementAt(i).key}: ${commodityAttendance.entries.elementAt(i).value.toStringAsFixed(2)}',
-                                    style: const TextStyle(fontSize: 8.0),
-                                  ),
-                                ),
-                              if (i + 1 < commodityAttendance.length)
-                                Chip(
-                                  label: Text(
-                                    '${commodityAttendance.entries.elementAt(i + 1).key}: ${commodityAttendance.entries.elementAt(i + 1).value.toStringAsFixed(2)}',
-                                    style: const TextStyle(fontSize: 8.0),
-                                  ),
-                                ),
-                            ],
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
               Row(
                 children: [
                   const Text('Make Transaction:'),
