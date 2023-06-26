@@ -96,7 +96,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Success'),
-                content: const Text('Supervisor saved successfully.'),
+                content: const Text('Vendor saved successfully.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -117,7 +117,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Failure'),
-                content: const Text('Failed to save supervisor.'),
+                content: const Text('Failed to save vendor.'),
                 actions: [
                   TextButton(
                     onPressed: () {

@@ -1,7 +1,9 @@
+import 'package:bifrost_ui/Employees/Vendors/vendor_actions.dart';
 import 'package:flutter/material.dart';
 
 import 'EmployeeAttendance/employee_attendance_input_dialog.dart';
 import 'VendorAttendance/vendor_attendance_input_dialog.dart';
+import 'VendorAttendance/vendor_attendance_list.dart';
 
 class SelectAttendanceTypeForViewDialog extends StatefulWidget {
   const SelectAttendanceTypeForViewDialog({super.key});
@@ -15,19 +17,24 @@ class SelectAttendanceTypeForViewDialog extends StatefulWidget {
 class _SelectAttendanceTypeForViewDialog extends State<SelectAttendanceTypeForViewDialog> {
   String? selectedOption;
 
-  void selectOption(String? option) {
+  Future<void> selectOption(String? option) async {
     setState(() {
       selectedOption = option;
     });
 
     // Perform different actions based on the selected option
     if (option == 'Vendor') {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return const VendorAttendanceInputDialog();
-        },
-      );
+      VendorActions vendorActions = VendorActions();
+      List<VendorAttendanceDTO> vendorAttendanceDTOs = await vendorActions.getAllVendorAttendance();
+      Future.microtask(() {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                VendorAttendanceListPage(vendorAttendances: vendorAttendanceDTOs),
+          ),
+        );
+      });
     } else if (option == 'Employee') {
       showDialog(
         context: context,
