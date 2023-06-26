@@ -53,7 +53,7 @@ class EmployeeAttendanceTile extends StatelessWidget {
             children: [
               const Icon(Icons.calendar_today),
               const SizedBox(width: 4),
-              Text('${employeeAttendance.attendanceDate ?? ''}'),
+              Text(employeeAttendance.attendanceDate ?? ''),
             ],
           ),
         ],

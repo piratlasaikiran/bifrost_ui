@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 
+import '../../Utils/formatting_util.dart';
 import '../../Utils/user_manager.dart';
 
 import 'package:http/http.dart' as http;
@@ -26,7 +27,7 @@ class VendorAttendanceDTO{
   final String site;
   final String vendorId;
   final String enteredBy;
-  final DateTime? attendanceDate;
+  final String attendanceDate;
   final Map<String, int> commodityAttendance;
   final bool makeTransaction;
   final String? bankAccount;
@@ -43,6 +44,8 @@ class VendorAttendanceDTO{
 }
 
 class VendorActions{
+
+  FormattingUtility formattingUtility = FormattingUtility();
 
   Future<bool> saveAttendance({
     required String vendorId,
@@ -191,14 +194,11 @@ class VendorActions{
     var response = await http.get(url, headers: headers);
     List<dynamic> vendorAttendanceDTOs = jsonDecode(response.body);
     final List<VendorAttendanceDTO> vendorAttendances = vendorAttendanceDTOs.map((data) {
-      final processedAttendanceDate = data['attendance_date'] is String
-          ? DateTime.parse(data['attendance_date'] as String)
-          : null;
       return VendorAttendanceDTO(
         vendorId: data['vendor_id'] as String,
         site: data['site'] as String,
         enteredBy: data['entered_by'] as String,
-        attendanceDate: processedAttendanceDate,
+        attendanceDate: formattingUtility.getDate(data['attendance_date']),
         commodityAttendance: _convertToCommodityIntegerMap(data['commodity_attendance']),
         makeTransaction: data['make_transaction'] as bool,
         bankAccount: data['bank_account'] as String?,

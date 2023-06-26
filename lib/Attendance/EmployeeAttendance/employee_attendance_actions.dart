@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:bifrost_ui/Utils/formatting_util.dart';
+
 import '../../Utils/user_manager.dart';
 
 import 'package:http/http.dart' as http;
@@ -9,7 +11,7 @@ class EmployeeAttendanceDTO{
   final String employeeName;
   final String employeeType;
   final String enteredBy;
-  final DateTime? attendanceDate;
+  final String attendanceDate;
   final String attendanceType;
   final bool makeTransaction;
   final String? bankAccount;
@@ -27,6 +29,9 @@ class EmployeeAttendanceDTO{
 }
 
 class EmployeeAttendanceActions {
+
+  FormattingUtility formattingUtility = FormattingUtility();
+
   Future<List<String>> getEmployeeTypes() async {
     UserManager userManager = UserManager();
     var url = Uri.parse(
@@ -95,15 +100,12 @@ class EmployeeAttendanceActions {
     var response = await http.get(url, headers: headers);
     List<dynamic> vendorAttendanceDTOs = jsonDecode(response.body);
     final List<EmployeeAttendanceDTO> employeeAttendances = vendorAttendanceDTOs.map((data) {
-      final processedAttendanceDate = data['attendance_date'] is String
-          ? DateTime.parse(data['attendance_date'] as String)
-          : null;
       return EmployeeAttendanceDTO(
         employeeName: data['employee_name'] as String,
         employeeType: data['employee_type'] as String,
         site: data['site'] as String,
         enteredBy: data['entered_by'] as String,
-        attendanceDate: processedAttendanceDate,
+        attendanceDate: formattingUtility.getDate(data['attendance_date']),
         attendanceType: data['attendance_type'] as String,
         makeTransaction: data['make_transaction'] as bool,
         bankAccount: data['bank_account'] as String?,
