@@ -1,7 +1,9 @@
+import 'package:bifrost_ui/Attendance/EmployeeAttendance/employee_attendance_actions.dart';
 import 'package:bifrost_ui/Employees/Vendors/vendor_actions.dart';
 import 'package:flutter/material.dart';
 
 import 'EmployeeAttendance/employee_attendance_input_dialog.dart';
+import 'EmployeeAttendance/employee_attendance_list.dart';
 import 'VendorAttendance/vendor_attendance_input_dialog.dart';
 import 'VendorAttendance/vendor_attendance_list.dart';
 
@@ -36,12 +38,17 @@ class _SelectAttendanceTypeForViewDialog extends State<SelectAttendanceTypeForVi
         );
       });
     } else if (option == 'Employee') {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return const EmployeeAttendanceInputDialog();
-        },
-      );
+      EmployeeAttendanceActions employeeAttendanceActions = EmployeeAttendanceActions();
+      List<EmployeeAttendanceDTO> employeeAttendanceDTOs = await employeeAttendanceActions.getAllEmployeeAttendance();
+      Future.microtask(() {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                EmployeeAttendanceListPage(employeeAttendances: employeeAttendanceDTOs),
+          ),
+        );
+      });
     }
   }
 

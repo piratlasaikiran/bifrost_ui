@@ -1,39 +1,39 @@
-import 'package:bifrost_ui/Employees/Supervisor/supervisor_actions.dart';
-import 'package:bifrost_ui/Employees/Vendors/vendor_actions.dart';
 import 'package:flutter/material.dart';
 
-class VendorAttendanceListPage extends StatelessWidget {
-  final List<VendorAttendanceDTO> vendorAttendances;
+import 'employee_attendance_actions.dart';
 
-  const VendorAttendanceListPage({Key? key, required this.vendorAttendances}) : super(key: key);
+class EmployeeAttendanceListPage extends StatelessWidget {
+  final List<EmployeeAttendanceDTO> employeeAttendances;
+
+  const EmployeeAttendanceListPage({Key? key, required this.employeeAttendances}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vendor Attendances'),
+        title: const Text('Employee Attendances'),
       ),
       body: ListView.separated(
-        itemCount: vendorAttendances.length,
+        itemCount: employeeAttendances.length,
         separatorBuilder: (context, index) => Divider(color: Colors.grey[800]),
         itemBuilder: (context, index) {
-          return VendorAttendanceTile(vendorAttendance: vendorAttendances[index]);
+          return EmployeeAttendanceTile(employeeAttendance: employeeAttendances[index]);
         },
       ),
     );
   }
 }
 
-class VendorAttendanceTile extends StatelessWidget {
-  final VendorAttendanceDTO vendorAttendance;
+class EmployeeAttendanceTile extends StatelessWidget {
+  final EmployeeAttendanceDTO employeeAttendance;
 
-  const VendorAttendanceTile({Key? key, required this.vendorAttendance}) : super(key: key);
+  const EmployeeAttendanceTile({Key? key, required this.employeeAttendance}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(
-        vendorAttendance.vendorId ?? '',
+        employeeAttendance.employeeName ?? '',
         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
       ),
       subtitle: Row(
@@ -44,7 +44,7 @@ class VendorAttendanceTile extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text(vendorAttendance.site ?? ''),
+                  Text(employeeAttendance.site ?? ''),
                 ],
               ),
             ],
@@ -53,7 +53,7 @@ class VendorAttendanceTile extends StatelessWidget {
             children: [
               const Icon(Icons.calendar_today),
               const SizedBox(width: 4),
-              Text('${vendorAttendance.attendanceDate ?? ''}'),
+              Text('${employeeAttendance.attendanceDate ?? ''}'),
             ],
           ),
         ],
@@ -61,3 +61,5 @@ class VendorAttendanceTile extends StatelessWidget {
     );
   }
 }
+
+

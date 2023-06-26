@@ -4,6 +4,28 @@ import '../../Utils/user_manager.dart';
 
 import 'package:http/http.dart' as http;
 
+class EmployeeAttendanceDTO{
+  final String site;
+  final String employeeName;
+  final String employeeType;
+  final String enteredBy;
+  final DateTime? attendanceDate;
+  final String attendanceType;
+  final bool makeTransaction;
+  final String? bankAccount;
+
+  EmployeeAttendanceDTO({
+    required this.site,
+    required this.employeeName,
+    required this.employeeType,
+    required this.enteredBy,
+    required this.attendanceDate,
+    required this.attendanceType,
+    required this.makeTransaction,
+    required this.bankAccount,
+  });
+}
+
 class EmployeeAttendanceActions {
   Future<List<String>> getEmployeeTypes() async {
     UserManager userManager = UserManager();
@@ -64,5 +86,29 @@ class EmployeeAttendanceActions {
     } else {
       return false;
     }
+  }
+
+  Future<List<EmployeeAttendanceDTO>> getAllEmployeeAttendance() async{
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/employee-attendance/');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<dynamic> vendorAttendanceDTOs = jsonDecode(response.body);
+    final List<EmployeeAttendanceDTO> employeeAttendances = vendorAttendanceDTOs.map((data) {
+      final processedAttendanceDate = data['attendance_date'] is String
+          ? DateTime.parse(data['attendance_date'] as String)
+          : null;
+      return EmployeeAttendanceDTO(
+        employeeName: data['employee_name'] as String,
+        employeeType: data['employee_type'] as String,
+        site: data['site'] as String,
+        enteredBy: data['entered_by'] as String,
+        attendanceDate: processedAttendanceDate,
+        attendanceType: data['attendance_type'] as String,
+        makeTransaction: data['make_transaction'] as bool,
+        bankAccount: data['bank_account'] as String?,
+      );
+    }).toList();
+    return employeeAttendances;
   }
 }
