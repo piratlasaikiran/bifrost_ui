@@ -198,7 +198,7 @@ class VendorActions{
         vendorId: data['vendor_id'] as String,
         site: data['site'] as String,
         enteredBy: data['entered_by'] as String,
-        attendanceDate: formattingUtility.getDate(data['attendance_date']),
+        attendanceDate: formattingUtility.getDateFromLocalDate(data['attendance_date']),
         commodityAttendance: _convertToCommodityIntegerMap(data['commodity_attendance']),
         makeTransaction: data['make_transaction'] as bool,
         bankAccount: data['bank_account'] as String?,
