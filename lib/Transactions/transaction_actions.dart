@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 
+import '../Utils/formatting_util.dart';
 import '../Utils/user_manager.dart';
 import 'package:http/http.dart' as http;
 
@@ -11,7 +12,7 @@ class TransactionDTO{
   final int amount;
   final String purpose;
   final String? remarks;
-  final DateTime? transactionDate;
+  final String transactionDate;
   final String status;
   final String mode;
   final String? bankAccount;
@@ -31,6 +32,9 @@ class TransactionDTO{
 
 
 class TransactionActions{
+
+  FormattingUtility formattingUtility = FormattingUtility();
+
   Future<bool> saveTransaction({
     required String? source,
     required String? destination,
@@ -84,9 +88,6 @@ class TransactionActions{
     var response = await http.get(url, headers: headers);
     List<dynamic> transactionDTOs = jsonDecode(response.body);
     final List<TransactionDTO> transactions = transactionDTOs.map((data) {
-      final processedTransactionDate = data['transaction_date'] is String
-          ? DateTime.parse(data['transaction_date'] as String)
-          : null;
       return TransactionDTO(
         source: data['source'] as String,
         destination: data['destination'] as String,
@@ -95,8 +96,8 @@ class TransactionActions{
         remarks: data['remarks'] as String?,
         status: data['status'] as String,
         mode: data['mode'] as String,
-        bankAccount: data['bank_account'] as String,
-        transactionDate: processedTransactionDate,
+        bankAccount: data['bank_account'] as String?,
+        transactionDate: formattingUtility.getDateFromLocalDate(data['transaction_date']),
       );
     }).toList();
     return transactions;
