@@ -64,7 +64,6 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
         return;
       }
 
-      SupervisorActions supervisorActions = SupervisorActions();
       final result = await supervisorActions.updateSupervisor(name: _name, mobileNumber: _mobileNumber, bankAccountNumber: _bankAccountNumber, salary: _salary, isAdmin: _admin,
           aadhar: _aadharImage, companyMobileNumber: _companyMobileNumber, atmCard: _atmCardNumber, vehicleNumber: _vehicleNumber, otPay: _otPay);
       if (result) {
@@ -89,6 +88,7 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
             },
           );
         });
+        supervisorActions.deleteTemporaryLocation(_aadharImage!);
       } else {
         Future.microtask(() {
           showDialog(
@@ -111,7 +111,6 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
         });
       }
     }
-    supervisorActions.deleteTemporaryLocation(_aadharImage!);
   }
 
   void _pickAadharImage(ImageSource source) async {

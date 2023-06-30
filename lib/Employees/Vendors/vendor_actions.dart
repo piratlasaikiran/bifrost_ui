@@ -8,7 +8,7 @@ import '../../Utils/user_manager.dart';
 import 'package:http/http.dart' as http;
 
 class VendorDTO{
-  final String? vendorId;
+  final String vendorId;
   final String? location;
   final int? mobileNumber;
   final String? purpose;
@@ -156,7 +156,7 @@ class VendorActions{
     List<dynamic> vendorDTOs = jsonDecode(response.body);
     final List<VendorDTO> drivers = vendorDTOs.map((data) {
       return VendorDTO(
-          vendorId: data['vendor_id'] as String?,
+          vendorId: data['vendor_id'] as String,
           location: data['location'] as String?,
           mobileNumber: data['mobile_number'] as int?,
           purpose: data['purpose'] as String?,
@@ -205,5 +205,64 @@ class VendorActions{
       );
     }).toList();
     return vendorAttendances;
+  }
+
+  Future<File?> getContractDoc(String vendorId) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/$vendorId/get-contract-document');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      List<int> fileBytes = response.bodyBytes;
+      final tempDir = Directory.systemTemp.createTempSync();
+      var tempPath = '${tempDir.path}/temp_file';
+      var file = File(tempPath);
+      await file.writeAsBytes(fileBytes);
+      return file;
+    }
+    return null;
+  }
+
+  void deleteTemporaryLocation(File contractDocLocation) {
+    if (contractDocLocation.existsSync()) {
+      contractDocLocation.deleteSync();
+    }
+  }
+
+  Future<bool> updateVendor({
+    required String? vendorId,
+    required int? mobileNumber,
+    required String? location,
+    required String? purpose,
+    required File? contractDoc,
+    required Map<String, int> selectedCommodities,
+  }) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/$vendorId/update-vendor');
+    var formData = {
+      'vendor_id': vendorId,
+      'mobile_number': mobileNumber,
+      'purpose': purpose,
+      'location': location,
+      'commodity_costs': selectedCommodities,
+    };
+    var jsonPart = http.MultipartFile.fromString(
+      'createVendorPayLoad',
+      jsonEncode(formData),
+      contentType: MediaType('application', 'json'),
+    );
+    var request = http.MultipartRequest('PUT', url);
+    var imageField = await http.MultipartFile.fromPath('contractDocument', contractDoc!.path);
+
+    request.headers['X-User-Id'] = userManager.username;
+    request.files.add(jsonPart);
+    request.files.add(imageField);
+
+    var response = await request.send();
+    if(response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

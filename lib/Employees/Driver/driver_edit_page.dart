@@ -121,6 +121,8 @@ class _DriverEditDialogState extends State<DriverEditDialog> {
             },
           );
         });
+        driverActions.deleteTemporaryLocation(_aadharImage!);
+        driverActions.deleteTemporaryLocation(_licenseImage!);
       } else {
         Future.microtask(() {
           showDialog(
@@ -143,8 +145,6 @@ class _DriverEditDialogState extends State<DriverEditDialog> {
         });
       }
     }
-    driverActions.deleteTemporaryLocation(_aadharImage!);
-    driverActions.deleteTemporaryLocation(_licenseImage!);
   }
 
   void _pickAadharImage(ImageSource source) async {

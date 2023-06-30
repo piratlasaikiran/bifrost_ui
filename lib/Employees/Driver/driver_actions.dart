@@ -177,9 +177,9 @@ class DriverActions {
     return null;
   }
 
-  void deleteTemporaryLocation(File aadharImageLocation) {
-    if (aadharImageLocation.existsSync()) {
-      aadharImageLocation.deleteSync();
+  void deleteTemporaryLocation(File imageLocation) {
+    if (imageLocation.existsSync()) {
+      imageLocation.deleteSync();
     }
   }
 
