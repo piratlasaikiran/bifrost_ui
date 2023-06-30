@@ -215,8 +215,8 @@ class _TransactionListPageState extends State<TransactionListPage> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: Colors.blue, // Head color
-            hintColor: Colors.blue, // Selection color
+            primaryColor: Colors.blue,
+            hintColor: Colors.blue,
             colorScheme: const ColorScheme.light(primary: Colors.blue),
             buttonTheme: const ButtonThemeData(
               textTheme: ButtonTextTheme.primary,
