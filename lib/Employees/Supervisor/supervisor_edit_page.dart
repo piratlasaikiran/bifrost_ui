@@ -32,7 +32,6 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
   void initState() {
     super.initState();
     _fetchAadhar();
-
   }
 
   Future<void> _fetchAadhar() async {

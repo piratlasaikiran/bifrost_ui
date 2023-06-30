@@ -4,15 +4,18 @@ import 'package:bifrost_ui/Employees/Driver/driver_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class DriverInputDialog extends StatefulWidget {
-  const DriverInputDialog({super.key});
+class DriverEditDialog extends StatefulWidget {
+  final DriverDTO driver;
+
+  const DriverEditDialog({Key? key, required this.driver}) : super(key: key);
 
   @override
-  _DriverInputDialogState createState() => _DriverInputDialogState();
+  _DriverEditDialogState createState() => _DriverEditDialogState();
 }
 
-class _DriverInputDialogState extends State<DriverInputDialog> {
+class _DriverEditDialogState extends State<DriverEditDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  DriverActions driverActions = DriverActions();
   late BuildContext dialogContext;
 
   String? _name;
@@ -25,7 +28,27 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
   double? _otPayDay;
   double? _otPayDayNight;
 
-  Future<void> _saveDriver() async {
+  void initState() {
+    super.initState();
+    _fetchAadhar();
+    _fetchLicense();
+  }
+
+  Future<void> _fetchAadhar() async {
+    final aadharImage = await driverActions.getAadhar(widget.driver.name);
+    setState(() {
+      _aadharImage = aadharImage;
+    });
+  }
+
+  Future<void> _fetchLicense() async {
+    final licenseImage = await driverActions.getLicense(widget.driver.name);
+    setState(() {
+      _licenseImage = licenseImage;
+    });
+  }
+
+  Future<void> _updateDriver() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -68,7 +91,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
       }
 
       DriverActions supervisorActions = DriverActions();
-      final result = await supervisorActions.saveDriver(name: _name,
+      final result = await supervisorActions.updateDriver(name: _name,
           mobileNumber: _mobileNumber,
           bankAccountNumber: _bankAccountNumber,
           salary: _salary,
@@ -78,14 +101,13 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
           otPayDay: _otPayDay,
           otPayDayNight: _otPayDayNight);
       if (result) {
-        // Show success popup
         Future.microtask(() {
           showDialog(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Success'),
-                content: const Text('Driver saved successfully.'),
+                content: const Text('Driver edited successfully.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -106,7 +128,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Failure'),
-                content: const Text('Failed to save driver.'),
+                content: const Text('Failed to edit driver.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -121,6 +143,8 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
         });
       }
     }
+    driverActions.deleteTemporaryLocation(_aadharImage!);
+    driverActions.deleteTemporaryLocation(_licenseImage!);
   }
 
   void _pickAadharImage(ImageSource source) async {
@@ -272,6 +296,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Name',
                 ),
+                initialValue: widget.driver.name,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a name';
@@ -286,6 +311,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Mobile Number',
                 ),
+                initialValue: widget.driver.mobileNumber.toString(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a mobile number';
@@ -303,6 +329,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Bank Account Number',
                 ),
+                initialValue: widget.driver.bankAccountNumber,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a bank account number';
@@ -318,6 +345,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
                   labelText: 'Salary',
                 ),
                 keyboardType: TextInputType.number,
+                initialValue: widget.driver.salary.toString(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter salary';
@@ -334,7 +362,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
               ),
               SwitchListTile(
                 title: const Text('Admin'),
-                value: _admin,
+                value: widget.driver.admin!,
                 onChanged: (value) {
                   setState(() {
                     _admin = value;
@@ -348,6 +376,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
                   labelText: 'OT Pay Day',
                 ),
                 keyboardType: TextInputType.number,
+                initialValue: widget.driver.otPayDay.toString(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter OT pay for day';
@@ -367,6 +396,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
                   labelText: 'OT Pay Day&Night',
                 ),
                 keyboardType: TextInputType.number,
+                initialValue: widget.driver.otPayDayNight.toString(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter OT pay for day&night';
@@ -395,7 +425,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
         ElevatedButton(
           onPressed: (){
             dialogContext = context;
-            _saveDriver();
+            _updateDriver();
           },
           child: const Text('Save'),
         ),
