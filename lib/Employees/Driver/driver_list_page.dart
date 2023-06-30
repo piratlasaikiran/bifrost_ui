@@ -132,6 +132,10 @@ class _DriverListPage extends State<DriverListPage> {
                             },
                           ),
                         ),
+                        const Divider(
+                          color: Colors.grey,
+                          thickness: 1.0,
+                        ),
                       ]
                   );
                 }

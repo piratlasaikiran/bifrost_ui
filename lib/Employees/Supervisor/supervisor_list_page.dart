@@ -131,6 +131,10 @@ class _SupervisorListPage extends State<SupervisorListPage> {
                           },
                         ),
                       ),
+                      const Divider(
+                        color: Colors.grey,
+                        thickness: 1.0,
+                      ),
                     ]
                   );
                 }

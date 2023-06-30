@@ -130,6 +130,10 @@ class _VendorListPage extends State<VendorListPage> {
                             },
                           ),
                         ),
+                        const Divider(
+                          color: Colors.grey,
+                          thickness: 1.0,
+                        ),
                       ]
                   );
                 }
