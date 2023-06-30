@@ -1,19 +1,16 @@
 import 'package:bifrost_ui/BankAccounts/passbook_actions.dart';
 import 'package:flutter/material.dart';
 
-
 class AccountPassBook extends StatefulWidget {
   final String accountName;
 
-  const AccountPassBook({Key? key, required this.accountName})
-      : super(key: key);
+  const AccountPassBook({Key? key, required this.accountName}) : super(key: key);
 
   @override
   _AccountPassBook createState() => _AccountPassBook();
 }
 
 class _AccountPassBook extends State<AccountPassBook> {
-
   List<PassBookDTO> passBookEntries = [];
   PassBookActions passBookActions = PassBookActions();
   TextEditingController accountNameController = TextEditingController();
@@ -25,11 +22,11 @@ class _AccountPassBook extends State<AccountPassBook> {
   }
 
   Future<void> _fetchPassBookEntries() async {
-    final passBookEntriesForAccount = await passBookActions.getPassBookEntries(widget.accountName);
+    final passBookEntriesForAccount =
+    await passBookActions.getPassBookEntries(widget.accountName);
     setState(() {
       passBookEntries = passBookEntriesForAccount;
     });
-
   }
 
   @override
@@ -48,7 +45,7 @@ class _AccountPassBook extends State<AccountPassBook> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text('${widget.accountName} \'s PassBook')
+        title: Text('${widget.accountName}\'s PassBook'),
       ),
       body: Column(
         children: [
@@ -76,8 +73,9 @@ class _AccountPassBook extends State<AccountPassBook> {
           ),
           Divider(color: Colors.grey[800]),
           Expanded(
-            child: ListView.builder(
+            child: ListView.separated(
               itemCount: passBookEntries.length,
+              separatorBuilder: (context, index) => Divider(color: Colors.grey[800]),
               itemBuilder: (context, index) {
                 final passBookEntry = passBookEntries[index];
                 return GestureDetector(
@@ -89,83 +87,80 @@ class _AccountPassBook extends State<AccountPassBook> {
                     //   ),
                     // );
                   },
-                  child: Column(
-                    children: [
-                      ListTile(
-                        title: Text(
-                          passBookEntry.transactionType == 'DEBIT' ? passBookEntry.transactionDTO.destination : passBookEntry.transactionDTO.source,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                        ),
-                        subtitle: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: ListTile(
+                    title: Text(
+                      passBookEntry.transactionType == 'DEBIT'
+                          ? passBookEntry.transactionDTO.destination
+                          : passBookEntry.transactionDTO.source,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                    ),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Chip(
-                                      label: Text(passBookEntry.transactionDTO.purpose ?? ''),
-                                      backgroundColor: Colors.blue,
-                                      labelStyle: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 8,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Chip(
-                                      label: Text(passBookEntry.transactionDTO.mode ?? ''),
-                                      backgroundColor: Colors.orange,
-                                      labelStyle: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 8,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.currency_rupee_rounded),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      passBookEntry.transactionType == 'DEBIT' ? '-' : '+',
-                                      style: TextStyle(
-                                        color: passBookEntry.transactionType == 'DEBIT'
-                                            ? Colors.red
-                                            : Colors.green,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                    Text(
-                                      passBookEntry.transactionAmount.toString() ?? '',
-                                      style: TextStyle(
-                                        color: passBookEntry.transactionType == 'DEBIT'
-                                            ? Colors.red
-                                            : Colors.green,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  passBookEntry.currentBalance.toString() ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black54,
+                                Chip(
+                                  label: Text(passBookEntry.transactionDTO.purpose ?? ''),
+                                  backgroundColor: Colors.blue,
+                                  labelStyle: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 8,
                                   ),
                                 ),
+                                const SizedBox(width: 4),
+                                Chip(
+                                  label: Text(passBookEntry.transactionDTO.mode ?? ''),
+                                  backgroundColor: Colors.orange,
+                                  labelStyle: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 8,
+                                  ),
+                                )
                               ],
                             ),
                           ],
                         ),
-                      ),
-                      const Divider(color: Colors.grey),
-                    ],
+                        Column(
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.currency_rupee_rounded),
+                                const SizedBox(width: 4),
+                                Text(
+                                  passBookEntry.transactionType == 'DEBIT' ? '-' : '+',
+                                  style: TextStyle(
+                                    color: passBookEntry.transactionType == 'DEBIT'
+                                        ? Colors.red
+                                        : Colors.green,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                Text(
+                                  passBookEntry.transactionAmount.toString() ?? '',
+                                  style: TextStyle(
+                                    color: passBookEntry.transactionType == 'DEBIT'
+                                        ? Colors.red
+                                        : Colors.green,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              passBookEntry.currentBalance.toString() ?? '',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
