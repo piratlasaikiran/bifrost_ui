@@ -116,6 +116,15 @@ class TransactionActions{
     return modes;
   }
 
+  Future<List<String>> getStatuses() async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/transaction-statuses');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<String> statuses = jsonDecode(response.body).cast<String>();
+    return statuses;
+  }
+
   Future<List<String>> getPurposes() async {
     UserManager userManager = UserManager();
     var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/transaction-purposes');

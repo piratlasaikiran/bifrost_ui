@@ -55,6 +55,7 @@ class _TransactionListPageState extends State<TransactionListPage> {
     _fetchBankAccounts();
     _fetchSources();
     _fetchDestinations();
+    _fetchAvailableStatuses();
     filteredTransactions = widget.transactions;
   }
 
@@ -69,6 +70,13 @@ class _TransactionListPageState extends State<TransactionListPage> {
     final transactionModes = await transactionActions.getModes();
     setState(() {
       availableModes = transactionModes;
+    });
+  }
+
+  void _fetchAvailableStatuses() async {
+    final transactionStatuses = await transactionActions.getStatuses();
+    setState(() {
+      availableStatuses = transactionStatuses;
     });
   }
 
@@ -113,13 +121,13 @@ class _TransactionListPageState extends State<TransactionListPage> {
             selectedDestinations.contains(transaction.destination.toLowerCase());
         final isAmountMatch = filterAmount == 0 || transaction.amount == filterAmount;
         final isModeMatch = selectedModes.isEmpty ||
-            selectedModes.contains(transaction.mode.toLowerCase());
+            selectedModes.contains(transaction.mode);
         final isStatusMatch = selectedStatues.isEmpty ||
-            selectedStatues.contains(transaction.status.toLowerCase());
+            selectedStatues.contains(transaction.status);
         final isBankAccountMatch = selectedBankAccounts.isEmpty ||
-            selectedBankAccounts.contains(transaction.bankAccount!.toLowerCase());
+            selectedBankAccounts.contains(transaction.bankAccount!);
         final isPurposeMatch = selectedPurposes.isEmpty ||
-            selectedPurposes.contains(transaction.purpose.toLowerCase());
+            selectedPurposes.contains(transaction.purpose);
         final isTransactionStartDateMatch =
             filterTransactionStartDate == null || formattingUtility.getDateInDateTimeFormat(transaction.transactionDate).isAfter(filterTransactionStartDate!);
         final isTransactionEndDateMatch =
