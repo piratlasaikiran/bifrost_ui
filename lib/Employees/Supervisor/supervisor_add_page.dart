@@ -311,7 +311,7 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
           },
           child: const Text('Cancel'),
         ),
-        TextButton(
+        ElevatedButton(
           onPressed: (){
             dialogContext = context;
             _saveSupervisor();

@@ -2,6 +2,8 @@ import 'package:bifrost_ui/Employees/Supervisor/supervisor_actions.dart';
 import 'package:bifrost_ui/Sites/site_actions.dart';
 import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../Utils/formatting_util.dart';
 import 'add_asset_location.dart';
 import 'asset_actions.dart';
 
@@ -15,6 +17,9 @@ class AssetListPage extends StatefulWidget {
 }
 
 class _AssetListPageState extends State<AssetListPage> {
+
+  FormattingUtility formattingUtility = FormattingUtility();
+
   List<AssetDTO> filteredAssets = [];
   TextEditingController assetNameController = TextEditingController();
   TextEditingController assetTypeController = TextEditingController();
@@ -47,8 +52,8 @@ class _AssetListPageState extends State<AssetListPage> {
         final assetType = asset.assetType.toLowerCase();
         final location = asset.location.toLowerCase();
 
-        final isStartDateValid = startDate == null || asset.startDate!.isAfter(startDate!);
-        final isEndDateValid = endDate == null || asset.endDate!.isBefore(endDate!);
+        final isStartDateValid = startDate == null || formattingUtility.getDateInDateTimeFormat(asset.startDate).isAfter(startDate!);
+        final isEndDateValid = endDate == null || formattingUtility.getDateInDateTimeFormat(asset.endDate).isBefore(endDate!);
 
         return assetName.contains(filterAssetName) &&
             assetType.contains(filterAssetType) &&
@@ -214,44 +219,70 @@ class _AssetListPageState extends State<AssetListPage> {
             child: Row(
               children: [
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final pickedStartDate = await showDatePicker(
+                  child: InkWell(
+                    onTap: () async {
+                      final DateTime? pickedDate = await showDatePicker(
                         context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(1900),
+                        initialDate: startDate ?? DateTime.now(),
+                        firstDate: DateTime(2000),
                         lastDate: DateTime(2100),
                       );
-
-                      if (pickedStartDate != null) {
+                      if (pickedDate != null) {
                         setState(() {
-                          startDate = pickedStartDate;
+                          startDate = pickedDate;
                           applyFilters();
                         });
                       }
                     },
-                    child: Text(startDate != null ? 'Start: ${startDate!.toString().split(' ')[0]}' : 'Select Start Date'),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 20.0),
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Start Date',
+                          suffixIcon: Icon(Icons.calendar_today),
+                        ),
+                        child: Text(
+                          startDate != null
+                              ? DateFormat('yyyy-MM-dd').format(startDate!)
+                              : '',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8.0),
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final pickedEndDate = await showDatePicker(
+                  child: InkWell(
+                    onTap: () async {
+                      final DateTime? pickedDate = await showDatePicker(
                         context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(1900),
+                        initialDate: endDate ?? DateTime.now(),
+                        firstDate: DateTime(2000),
                         lastDate: DateTime(2100),
                       );
-
-                      if (pickedEndDate != null) {
+                      if (pickedDate != null) {
                         setState(() {
-                          endDate = pickedEndDate;
+                          endDate = pickedDate;
                           applyFilters();
                         });
                       }
                     },
-                    child: Text(endDate != null ? 'End: ${endDate!.toString().split(' ')[0]}' : 'Select End Date'),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 20.0),
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Start Date',
+                          suffixIcon: Icon(Icons.calendar_today),
+                        ),
+                        child: Text(
+                          endDate != null
+                              ? DateFormat('yyyy-MM-dd').format(endDate!)
+                              : '',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],

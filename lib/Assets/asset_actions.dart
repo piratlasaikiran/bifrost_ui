@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../Utils/formatting_util.dart';
 import '../Utils/user_manager.dart';
 import 'package:http/http.dart' as http;
 
@@ -7,8 +8,8 @@ class AssetDTO {
   final String assetType;
   final String assetName;
   final String location;
-  final DateTime? startDate;
-  final DateTime? endDate;
+  final String startDate;
+  final String endDate;
 
   AssetDTO({
     required this.assetType,
@@ -20,6 +21,8 @@ class AssetDTO {
 }
 
 class AssetActions{
+
+  FormattingUtility formattingUtility = FormattingUtility();
 
   Future<List<AssetDTO>> getAllAssetLocations() async {
     UserManager userManager = UserManager();
@@ -38,8 +41,8 @@ class AssetActions{
         assetName: data['asset_name'] as String,
         assetType: data['asset_type'] as String,
         location: data['location'] as String,
-        startDate: processedStartDate,
-        endDate: processedEndDate,
+        startDate: formattingUtility.getDateFromLocalDate(data['start_date']),
+        endDate: formattingUtility.getDateFromLocalDate(data['end_date']),
       );
     }).toList();
     return assets;

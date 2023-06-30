@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'Driver/driver_page.dart';
-import 'Supervisor/supervisor_page.dart';
+import 'Supervisor/supervisor_add_page.dart';
 import 'Vendors/vendor_page.dart';
 
 class SelectEmployeeTypeForCreationDialog extends StatefulWidget {
