@@ -88,19 +88,23 @@ class TransactionActions{
     var response = await http.get(url, headers: headers);
     List<dynamic> transactionDTOs = jsonDecode(response.body);
     final List<TransactionDTO> transactions = transactionDTOs.map((data) {
-      return TransactionDTO(
-        source: data['source'] as String,
-        destination: data['destination'] as String,
-        amount: data['amount'] as int,
-        purpose: data['purpose'] as String,
-        remarks: data['remarks'] as String?,
-        status: data['status'] as String,
-        mode: data['mode'] as String,
-        bankAccount: data['bank_account'] as String?,
-        transactionDate: formattingUtility.getDateFromLocalDate(data['transaction_date']),
-      );
+      return getTransactionDTO(data);
     }).toList();
     return transactions;
+  }
+
+  TransactionDTO getTransactionDTO(data) {
+    return TransactionDTO(
+      source: data['source'] as String,
+      destination: data['destination'] as String,
+      amount: data['amount'] as int,
+      purpose: data['purpose'] as String,
+      remarks: data['remarks'] as String?,
+      status: data['status'] as String,
+      mode: data['mode'] as String,
+      bankAccount: data['bank_account'] as String?,
+      transactionDate: formattingUtility.getDateFromLocalDate(data['transaction_date']),
+    );
   }
 
   Future<List<String>> getModes() async {

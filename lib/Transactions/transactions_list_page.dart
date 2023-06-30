@@ -9,6 +9,7 @@ import '../BankAccounts/bank_account_actions.dart';
 import '../Employees/Driver/driver_actions.dart';
 import '../Employees/Supervisor/supervisor_actions.dart';
 import '../Employees/Vendors/vendor_actions.dart';
+import '../Utils/formatting_util.dart';
 
 class TransactionListPage extends StatefulWidget {
   final List<TransactionDTO> transactions;
@@ -22,6 +23,7 @@ class TransactionListPage extends StatefulWidget {
 class _TransactionListPageState extends State<TransactionListPage> {
   TransactionActions transactionActions = TransactionActions();
   SupervisorActions supervisorActions = SupervisorActions();
+  FormattingUtility formattingUtility = FormattingUtility();
 
   List<TransactionDTO> filteredTransactions = [];
   int filterAmount = 0;
@@ -119,9 +121,9 @@ class _TransactionListPageState extends State<TransactionListPage> {
         final isPurposeMatch = selectedPurposes.isEmpty ||
             selectedPurposes.contains(transaction.purpose.toLowerCase());
         final isTransactionStartDateMatch =
-            filterTransactionStartDate == null || transaction.transactionDate == filterTransactionStartDate;
+            filterTransactionStartDate == null || formattingUtility.getDateInDateTimeFormat(transaction.transactionDate).isAfter(filterTransactionStartDate!);
         final isTransactionEndDateMatch =
-            filterTransactionEndDate == null || transaction.transactionDate == filterTransactionEndDate;
+            filterTransactionEndDate == null || formattingUtility.getDateInDateTimeFormat(transaction.transactionDate).isBefore(filterTransactionEndDate!);
 
         return isSourceMatch &&
             isDestinationMatch &&
@@ -257,6 +259,7 @@ class _TransactionListPageState extends State<TransactionListPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Amount: ${transaction.amount}'),
+          Text('Date: ${transaction.transactionDate}'),
         ],
       ),
 

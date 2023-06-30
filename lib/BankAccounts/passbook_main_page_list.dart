@@ -1,6 +1,8 @@
 import 'package:bifrost_ui/BankAccounts/passbook_actions.dart';
 import 'package:flutter/material.dart';
 
+import 'account_pass_book.dart';
+
 
 class PassBookMainPageListPage extends StatefulWidget {
   final List<PassBookDTO> passBookMainPages;
@@ -78,49 +80,59 @@ class _PassBookMainPageListPage extends State<PassBookMainPageListPage> {
               itemCount: filteredPassBooks.length,
               itemBuilder: (context, index) {
                 final passBook = filteredPassBooks[index];
-                return Column(
-                  children: [
-                    ListTile(
-                      title: Text(
-                        passBook.accountName ?? '',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AccountPassBook(accountName: passBook.accountName),
                       ),
-                      subtitle: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(passBook.accountType ?? ''),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Icon(Icons.currency_rupee_rounded),
-                              const SizedBox(width: 4),
-                              Text(
-                                passBook.currentBalance.toString() ?? '',
-                                style: TextStyle(
-                                  color: passBook.currentBalance > 0
-                                      ? Colors.green
-                                      : passBook.currentBalance < 0
-                                      ? Colors.red
-                                      : Colors.black,
-                                  fontSize: 20,
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: Text(
+                          passBook.accountName ?? '',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        subtitle: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(passBook.accountType ?? ''),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Icon(Icons.currency_rupee_rounded),
+                                const SizedBox(width: 4),
+                                Text(
+                                  passBook.currentBalance.toString() ?? '',
+                                  style: TextStyle(
+                                    color: passBook.currentBalance > 0
+                                        ? Colors.green
+                                        : passBook.currentBalance < 0
+                                        ? Colors.red
+                                        : Colors.black,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
 
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    const Divider(color: Colors.grey),
-                  ],
+                      const Divider(color: Colors.grey),
+                    ],
+                  ),
                 );
               },
             ),
