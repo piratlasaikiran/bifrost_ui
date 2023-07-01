@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bifrost_ui/BankAccounts/bank_account_actions.dart';
 import 'package:bifrost_ui/Employees/Supervisor/supervisor_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,6 +14,7 @@ class SupervisorInputDialog extends StatefulWidget {
 
 class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  BankAccountActions bankAccountActions = BankAccountActions();
   late BuildContext dialogContext;
 
   String? _name;
@@ -25,6 +27,21 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
   String? _atmCardNumber;
   String? _vehicleNumber;
   double? _otPay;
+
+  List<String> availableATMCards = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchATMCards();
+  }
+
+  void _fetchATMCards() async {
+    final atmCards = await bankAccountActions.getATMCards();
+    setState(() {
+      availableATMCards = atmCards;
+    });
+  }
 
   Future<void> _saveSupervisor() async {
     if (_formKey.currentState!.validate()) {
@@ -193,6 +210,7 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Mobile Number',
                 ),
+                keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a mobile number';
@@ -265,13 +283,28 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
                   _companyMobileNumber = value;
                 },
               ),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'ATM Card Number',
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 14.0),
+                child: Row(
+                  children: [
+                    const Text('ATM Card'),
+                    const SizedBox(width: 10),
+                    DropdownButton<String>(
+                      value: _atmCardNumber,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _atmCardNumber = newValue!;
+                        });
+                      },
+                      items: availableATMCards.map((String atmCard) {
+                        return DropdownMenuItem<String>(
+                          value: atmCard,
+                          child: Text(atmCard),
+                        );
+                      }).toList(),
+                    ),
+                  ],
                 ),
-                onSaved: (value) {
-                  _atmCardNumber = value;
-                },
               ),
               TextFormField(
                 decoration: const InputDecoration(

@@ -78,6 +78,7 @@ class SupervisorActions {
   }
 
   Future<bool> updateSupervisor({
+    required String existingSupervisor,
     required String? name,
     required String? mobileNumber,
     required String? bankAccountNumber,
@@ -90,7 +91,7 @@ class SupervisorActions {
     required double? otPay,
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/$name/update-supervisor');
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/$existingSupervisor/update-supervisor');
     var formData = {
       'name': name,
       'personal_mobile_num': mobileNumber,

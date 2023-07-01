@@ -4,6 +4,8 @@ import 'package:bifrost_ui/Employees/Supervisor/supervisor_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../BankAccounts/bank_account_actions.dart';
+
 class SupervisorEditDialog extends StatefulWidget {
   final SupervisorDTO supervisor;
 
@@ -16,6 +18,7 @@ class SupervisorEditDialog extends StatefulWidget {
 class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   SupervisorActions supervisorActions = SupervisorActions();
+  BankAccountActions bankAccountActions = BankAccountActions();
   late BuildContext dialogContext;
 
   String? _name;
@@ -29,15 +32,27 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
   String? _vehicleNumber;
   double? _otPay;
 
+  List<String> availableATMCards = [];
+
+  @override
   void initState() {
     super.initState();
     _fetchAadhar();
+    _fetchATMCards();
   }
 
   Future<void> _fetchAadhar() async {
     final aadharImage = await supervisorActions.getAadhar(widget.supervisor.name);
     setState(() {
       _aadharImage = aadharImage;
+    });
+  }
+
+  void _fetchATMCards() async {
+    final atmCards = await bankAccountActions.getATMCards();
+    setState(() {
+      availableATMCards = atmCards;
+      _atmCardNumber = availableATMCards.firstWhere((card) => card == widget.supervisor.atmCardNumber.toString(),  orElse: () => '');
     });
   }
 
@@ -64,7 +79,7 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
         return;
       }
 
-      final result = await supervisorActions.updateSupervisor(name: _name, mobileNumber: _mobileNumber, bankAccountNumber: _bankAccountNumber, salary: _salary, isAdmin: _admin,
+      final result = await supervisorActions.updateSupervisor(existingSupervisor: widget.supervisor.name, name: _name, mobileNumber: _mobileNumber, bankAccountNumber: _bankAccountNumber, salary: _salary, isAdmin: _admin,
           aadhar: _aadharImage, companyMobileNumber: _companyMobileNumber, atmCard: _atmCardNumber, vehicleNumber: _vehicleNumber, otPay: _otPay);
       if (result) {
         // Show success popup
@@ -285,14 +300,28 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
                   _companyMobileNumber = value;
                 },
               ),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'ATM Card Number',
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 14.0),
+                child: Row(
+                  children: [
+                    const Text('ATM Card'),
+                    const SizedBox(width: 10),
+                    DropdownButton<String>(
+                      value: _atmCardNumber,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _atmCardNumber = newValue!;
+                        });
+                      },
+                      items: availableATMCards.map((String atmCard) {
+                        return DropdownMenuItem<String>(
+                          value: atmCard,
+                          child: Text(atmCard),
+                        );
+                      }).toList(),
+                    ),
+                  ],
                 ),
-                initialValue: widget.supervisor.atmCardNumber.toString(),
-                onSaved: (value) {
-                  _atmCardNumber = value;
-                },
               ),
               TextFormField(
                 decoration: const InputDecoration(
