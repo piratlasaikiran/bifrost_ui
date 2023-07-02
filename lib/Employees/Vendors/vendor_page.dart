@@ -2,6 +2,9 @@ import 'dart:io';
 import 'package:bifrost_ui/Employees/Vendors/vendor_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
 import '../../Sites/site_actions.dart';
 
@@ -19,7 +22,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
   String? _vendorId;
   int? _mobileNumber;
   String? _selectedLocation;
-  String? _selectedPurpose;
+  List<String> _selectedPurposes = [];
   File? _contractDocument;
   final Map<String, int> _selectedCommodities = {};
 
@@ -85,7 +88,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
           vendorId: _vendorId,
           mobileNumber: _mobileNumber,
           location: _selectedLocation,
-          purpose: _selectedPurpose,
+          purposes: _selectedPurposes,
           contractDoc: _contractDocument,
           selectedCommodities: _selectedCommodities);
       if (result) {
@@ -366,23 +369,21 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
                 },
               ),
               const SizedBox(height: 16.0),
-              DropdownButtonFormField<String>(
-                value: _selectedPurpose,
-                decoration: const InputDecoration(labelText: 'Purpose'),
-                items: _purposeList.map((String purpose) {
-                  return DropdownMenuItem<String>(
-                    value: purpose,
-                    child: Text(purpose),
-                  );
-                }).toList(),
-                onChanged: (String? value) {
+              MultiSelectDialogField(
+                title: const Text('Vendor Purposes'),
+                buttonText: const Text('Vendor Purposes'),
+                items: _purposeList
+                    .map((mode) => MultiSelectItem<String>(mode, mode))
+                    .toList(),
+                listType: MultiSelectListType.CHIP,
+                onConfirm: (List<String> values) {
                   setState(() {
-                    _selectedPurpose = value;
+                    _selectedPurposes = values;
                   });
                 },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a purpose';
+                validator: (values) {
+                  if(values!.isEmpty){
+                    return 'Please select at least one purpose';
                   }
                   return null;
                 },

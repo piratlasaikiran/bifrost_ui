@@ -2,6 +2,9 @@ import 'dart:io';
 import 'package:bifrost_ui/Employees/Vendors/vendor_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
 import '../../Sites/site_actions.dart';
 
@@ -21,7 +24,7 @@ class _VendorEditDialogState extends State<VendorEditDialog> {
   String? _vendorId;
   int? _mobileNumber;
   String? _selectedLocation;
-  String? _selectedPurpose;
+  List<String> _selectedPurposes = [];
   File? _contractDocument;
   Map<String, int> _selectedCommodities = {};
 
@@ -52,7 +55,7 @@ class _VendorEditDialogState extends State<VendorEditDialog> {
     final purposes = await vendorActions.getVendorPurposes();
     setState(() {
       _purposeList = purposes;
-      _selectedPurpose = widget.vendor.purpose;
+      _selectedPurposes = widget.vendor.purposes;
     });
   }
 
@@ -95,10 +98,11 @@ class _VendorEditDialogState extends State<VendorEditDialog> {
       }
 
       final result = await vendorActions.updateVendor(
+          existingVendorId: widget.vendor.vendorId,
           vendorId: _vendorId,
           mobileNumber: _mobileNumber,
           location: _selectedLocation,
-          purpose: _selectedPurpose,
+          purposes: _selectedPurposes,
           contractDoc: _contractDocument,
           selectedCommodities: _selectedCommodities);
       if (result) {
@@ -382,23 +386,22 @@ class _VendorEditDialogState extends State<VendorEditDialog> {
                 },
               ),
               const SizedBox(height: 16.0),
-              DropdownButtonFormField<String>(
-                value: _selectedPurpose,
-                decoration: const InputDecoration(labelText: 'Purpose'),
-                items: _purposeList.map((String purpose) {
-                  return DropdownMenuItem<String>(
-                    value: purpose,
-                    child: Text(purpose),
-                  );
-                }).toList(),
-                onChanged: (String? value) {
+              MultiSelectDialogField(
+                title: const Text('Vendor Purposes'),
+                buttonText: const Text('Vendor Purposes'),
+                items: _purposeList
+                    .map((mode) => MultiSelectItem<String>(mode, mode))
+                    .toList(),
+                listType: MultiSelectListType.CHIP,
+                initialValue: widget.vendor.purposes,
+                onConfirm: (List<String> values) {
                   setState(() {
-                    _selectedPurpose = value;
+                    _selectedPurposes = values;
                   });
                 },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a purpose';
+                validator: (values) {
+                  if(values!.isEmpty){
+                    return 'Please select at least one purpose';
                   }
                   return null;
                 },

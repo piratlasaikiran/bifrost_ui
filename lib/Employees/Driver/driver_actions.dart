@@ -102,6 +102,7 @@ class DriverActions {
   }
 
   Future<bool> updateDriver({
+    required String existingDriver,
     required String? name,
     required String? mobileNumber,
     required String? bankAccountNumber,
@@ -113,7 +114,7 @@ class DriverActions {
     required double? otPayDayNight
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/drivers/$name/update-driver');
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/drivers/$existingDriver/update-driver');
     var formData = {
       'name': name,
       'personal_mobile_num': mobileNumber,

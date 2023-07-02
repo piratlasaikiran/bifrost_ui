@@ -50,6 +50,32 @@ class _VendorListPage extends State<VendorListPage> {
     }
   }
 
+  void _showCommodityPricesDialog(VendorDTO vendor) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Commodity Prices'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: vendor.commodityCosts.entries.map((entry) {
+                return Text('${entry.key}: ${entry.value}');
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,7 +118,20 @@ class _VendorListPage extends State<VendorListPage> {
                             vendor.vendorId ?? '',
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                           ),
-                          subtitle: Text('Mob: ${vendor.mobileNumber ?? ''}'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Site: ${vendor.location ?? ''}'),
+                              const SizedBox(height: 6.0),
+                              Wrap(
+                                spacing: 8.0,
+                                runSpacing: 4.0,
+                                children: vendor.purposes.map((purpose) {
+                                  return Chip(label: Text(purpose));
+                                }).toList(),
+                              ),
+                            ],
+                          ),
                           trailing: PopupMenuButton<String>(
                             itemBuilder: (context) {
                               return [
@@ -125,7 +164,7 @@ class _VendorListPage extends State<VendorListPage> {
                                 String phoneNumber = vendor.mobileNumber.toString() ?? '';
                                 _makePhoneCall(phoneNumber);
                               } else if (value == 'commodity_prices') {
-                                // Perform action for View & Edit
+                                _showCommodityPricesDialog(vendor);
                               }
                             },
                           ),

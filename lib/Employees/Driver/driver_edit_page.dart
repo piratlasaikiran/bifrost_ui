@@ -91,7 +91,8 @@ class _DriverEditDialogState extends State<DriverEditDialog> {
       }
 
       DriverActions supervisorActions = DriverActions();
-      final result = await supervisorActions.updateDriver(name: _name,
+      final result = await supervisorActions.updateDriver(existingDriver: widget.driver.name,
+          name: _name,
           mobileNumber: _mobileNumber,
           bankAccountNumber: _bankAccountNumber,
           salary: _salary,

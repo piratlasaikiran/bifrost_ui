@@ -11,14 +11,14 @@ class VendorDTO{
   final String vendorId;
   final String? location;
   final int? mobileNumber;
-  final String? purpose;
+  final List<String> purposes;
   final Map<String, int> commodityCosts;
 
   VendorDTO({
     required this.vendorId,
     required this.location,
     required this.mobileNumber,
-    required this.purpose,
+    required this.purposes,
     required this.commodityCosts
   });
 }
@@ -115,7 +115,7 @@ class VendorActions{
     required String? vendorId,
     required int? mobileNumber,
     required String? location,
-    required String? purpose,
+    required List<String> purposes,
     required File? contractDoc,
     required Map<String, int> selectedCommodities,
   }) async {
@@ -124,7 +124,7 @@ class VendorActions{
     var formData = {
       'vendor_id': vendorId,
       'mobile_number': mobileNumber,
-      'purpose': purpose,
+      'purposes': purposes,
       'location': location,
       'commodity_costs': selectedCommodities,
     };
@@ -159,7 +159,7 @@ class VendorActions{
           vendorId: data['vendor_id'] as String,
           location: data['location'] as String?,
           mobileNumber: data['mobile_number'] as int?,
-          purpose: data['purpose'] as String?,
+          purposes: data['purposes'].cast<String>(),
           commodityCosts: _convertToCommodityIntegerMap(data['commodity_costs']),
       );
     }).toList();
@@ -230,19 +230,20 @@ class VendorActions{
   }
 
   Future<bool> updateVendor({
+    required String existingVendorId,
     required String? vendorId,
     required int? mobileNumber,
     required String? location,
-    required String? purpose,
+    required List<String> purposes,
     required File? contractDoc,
     required Map<String, int> selectedCommodities,
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/$vendorId/update-vendor');
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/$existingVendorId/update-vendor');
     var formData = {
       'vendor_id': vendorId,
       'mobile_number': mobileNumber,
-      'purpose': purpose,
+      'purposes': purposes,
       'location': location,
       'commodity_costs': selectedCommodities,
     };

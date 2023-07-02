@@ -25,7 +25,6 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
   File? _aadharImage;
   String? _companyMobileNumber;
   String? _atmCardNumber;
-  String? _vehicleNumber;
   double? _otPay;
 
   List<String> availableATMCards = [];
@@ -68,7 +67,7 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
 
       SupervisorActions supervisorActions = SupervisorActions();
       final result = await supervisorActions.saveSupervisor(name: _name, mobileNumber: _mobileNumber, bankAccountNumber: _bankAccountNumber, salary: _salary, isAdmin: _admin,
-          aadhar: _aadharImage, companyMobileNumber: _companyMobileNumber, atmCard: _atmCardNumber, vehicleNumber: _vehicleNumber, otPay: _otPay);
+          aadhar: _aadharImage, companyMobileNumber: _companyMobileNumber, atmCard: _atmCardNumber, otPay: _otPay);
       if (result) {
         // Show success popup
         Future.microtask(() {
@@ -305,14 +304,6 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
                     ),
                   ],
                 ),
-              ),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Vehicle Number',
-                ),
-                onSaved: (value) {
-                  _vehicleNumber = value;
-                },
               ),
               TextFormField(
                 decoration: const InputDecoration(

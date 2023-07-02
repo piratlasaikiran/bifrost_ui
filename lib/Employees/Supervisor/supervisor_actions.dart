@@ -13,7 +13,6 @@ class SupervisorDTO {
   final bool? admin;
   final int? companyMobileNumber;
   final int? atmCardNumber;
-  final String? vehicleNumber;
   final int? otPay;
 
 
@@ -25,7 +24,6 @@ class SupervisorDTO {
     required this.admin,
     required this.companyMobileNumber,
     required this.atmCardNumber,
-    required this.vehicleNumber,
     required this.otPay
   });
 }
@@ -41,7 +39,6 @@ class SupervisorActions {
     required File? aadhar,
     required String? companyMobileNumber,
     required String? atmCard,
-    required String? vehicleNumber,
     required double? otPay,
   }) async {
     UserManager userManager = UserManager();
@@ -54,7 +51,6 @@ class SupervisorActions {
       'admin': isAdmin,
       'company_mob_num': companyMobileNumber,
       'atm_card': atmCard,
-      'vehicle_num': vehicleNumber,
       'ot_pay': otPay
     };
     var jsonPart = http.MultipartFile.fromString(
@@ -87,7 +83,6 @@ class SupervisorActions {
     required File? aadhar,
     required String? companyMobileNumber,
     required String? atmCard,
-    required String? vehicleNumber,
     required double? otPay,
   }) async {
     UserManager userManager = UserManager();
@@ -100,7 +95,6 @@ class SupervisorActions {
       'admin': isAdmin,
       'company_mob_num': companyMobileNumber,
       'atm_card': atmCard,
-      'vehicle_num': vehicleNumber,
       'ot_pay': otPay
     };
     var jsonPart = http.MultipartFile.fromString(
@@ -138,7 +132,6 @@ class SupervisorActions {
         admin: data['admin'] as bool?,
         companyMobileNumber: data['company_mob_num'] as int?,
         atmCardNumber: data['atm_card'] as int?,
-        vehicleNumber: data['vehicle_num'] as String?,
         otPay: data['ot_pay'] as int?,
       );
     }).toList();
