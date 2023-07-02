@@ -10,6 +10,7 @@ import '../Employees/Driver/driver_actions.dart';
 import '../Employees/Supervisor/supervisor_actions.dart';
 import '../Employees/Vendors/vendor_actions.dart';
 import '../Utils/formatting_util.dart';
+import 'edit_transaction_dialog.dart';
 
 class TransactionListPage extends StatefulWidget {
   final List<TransactionDTO> transactions;
@@ -321,7 +322,15 @@ class _TransactionListPageState extends State<TransactionListPage> {
             ],
             onSelected: (value) {
               if (value == 'view_edit') {
-                // Handle view & edit action
+                Future.microtask(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          EditTransactionDialog(transaction: transaction),
+                    ),
+                  );
+                });
               }else if (value == 'change_status') {
                 // Handle view & edit action
               }

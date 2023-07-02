@@ -78,8 +78,16 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
         return;
       }
 
-      final result = await supervisorActions.updateSupervisor(existingSupervisor: widget.supervisor.name, name: _name, mobileNumber: _mobileNumber, bankAccountNumber: _bankAccountNumber, salary: _salary, isAdmin: _admin,
-          aadhar: _aadharImage, companyMobileNumber: _companyMobileNumber, atmCard: _atmCardNumber, otPay: _otPay);
+      final result = await supervisorActions.updateSupervisor(existingSupervisor: widget.supervisor.name,
+          name: _name,
+          mobileNumber: _mobileNumber,
+          bankAccountNumber: _bankAccountNumber,
+          salary: _salary,
+          isAdmin: _admin,
+          aadhar: _aadharImage,
+          companyMobileNumber: _companyMobileNumber,
+          atmCard: _atmCardNumber,
+          otPay: _otPay);
       if (result) {
         // Show success popup
         Future.microtask(() {

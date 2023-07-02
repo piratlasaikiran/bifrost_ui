@@ -7,6 +7,7 @@ import '../Utils/user_manager.dart';
 import 'package:http/http.dart' as http;
 
 class TransactionDTO{
+  final int transactionId;
   final String source;
   final String destination;
   final int amount;
@@ -18,6 +19,7 @@ class TransactionDTO{
   final String? bankAccount;
 
   TransactionDTO({
+    required this.transactionId,
     required this.source,
     required this.destination,
     required this.amount,
@@ -78,7 +80,6 @@ class TransactionActions{
     } else {
       return false;
     }
-
   }
 
   Future<List<TransactionDTO>> getAllTransactions() async {
@@ -95,6 +96,7 @@ class TransactionActions{
 
   TransactionDTO getTransactionDTO(data) {
     return TransactionDTO(
+      transactionId: data['transaction_id'] as int,
       source: data['source'] as String,
       destination: data['destination'] as String,
       amount: data['amount'] as int,
@@ -132,6 +134,74 @@ class TransactionActions{
     var response = await http.get(url, headers: headers);
     List<String> purposes = jsonDecode(response.body).cast<String>();
     return purposes;
+  }
+
+  Future<bool> updateTransaction({
+    required int transactionId,
+    required String? source,
+    required String? destination,
+    required int? amount,
+    required File? bill,
+    required String? purpose,
+    required String? mode,
+    required String? bankAccount,
+    required DateTime? transactionDate,
+    required String? remarks
+  }) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/$transactionId/update-transaction');
+    var formData = {
+      'source': source,
+      'destination': destination,
+      'amount': amount,
+      'purpose': purpose,
+      'remarks': remarks,
+      'transaction_date': '${transactionDate!.year}-${transactionDate.month.toString().padLeft(2, '0')}-${transactionDate.day.toString().padLeft(2, '0')}',
+      'mode': mode,
+      'bank_account': bankAccount
+    };
+    var jsonPart = http.MultipartFile.fromString(
+      'createTransactionPayload',
+      jsonEncode(formData),
+      contentType: MediaType('application', 'json'),
+    );
+    var request = http.MultipartRequest('PUT', url);
+    if(bill != null){
+      var billField = await http.MultipartFile.fromPath('bill', bill!.path);
+      request.files.add(billField);
+    }
+
+    request.headers['X-User-Id'] = userManager.username;
+    request.files.add(jsonPart);
+
+    var response = await request.send();
+    if(response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<File?> getBill(int transactionId) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/$transactionId/get-bill');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      List<int> fileBytes = response.bodyBytes;
+      final tempDir = Directory.systemTemp.createTempSync();
+      var tempPath = '${tempDir.path}/temp_file';
+      var file = File(tempPath);
+      await file.writeAsBytes(fileBytes);
+      return file;
+    }
+    return null;
+  }
+
+  void deleteTemporaryLocation(File aadharImageLocation) {
+    if (aadharImageLocation.existsSync()) {
+      aadharImageLocation.deleteSync();
+    }
   }
 
 }
