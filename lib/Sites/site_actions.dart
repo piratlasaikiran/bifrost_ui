@@ -1,17 +1,18 @@
 import 'dart:convert';
 
+import '../Utils/formatting_util.dart';
 import '../Utils/user_manager.dart';
 
 import 'package:http/http.dart' as http;
 
 class SiteDTO{
-  final String? siteName;
+  final String siteName;
   final String? address;
   final String? siteStatus;
   final List<String>? supervisors;
   final List<String>? vehicles;
-  final DateTime? startDate;
-  final DateTime? endDate;
+  final String startDate;
+  final String endDate;
 
   SiteDTO({
     required this.siteName,
@@ -25,6 +26,8 @@ class SiteDTO{
 }
 
 class SiteActions{
+
+  FormattingUtility formattingUtility = FormattingUtility();
 
   Future<bool> saveSite({
     required String siteName,
@@ -44,7 +47,8 @@ class SiteActions{
         'vehicles': vehicles,
         'supervisors': supervisors,
         'work_start_date': '${startDate?.year}-${startDate?.month.toString().padLeft(2, '0')}-${startDate?.day.toString().padLeft(2, '0')}',
-        'work_end_date': '${endDate?.year}-${endDate?.month.toString().padLeft(2, '0')}-${endDate?.day.toString().padLeft(2, '0')}',
+        'work_end_date': (endDate != null) ? '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}' : null,
+
       };
       final headers = {
         'Content-Type': 'application/json',
@@ -70,20 +74,14 @@ class SiteActions{
     var response = await http.get(url, headers: headers);
     List<dynamic> siteDTOs = jsonDecode(response.body);
     final List<SiteDTO> sites = siteDTOs.map((data) {
-      final processedStartDate = data['work_start_date'] is String
-          ? DateTime.parse(data['work_start_date'] as String)
-          : null;
-      final processedEndDate = data['work_end_date'] is String
-          ? DateTime.parse(data['work_end_date'] as String)
-          : null;
       return SiteDTO(
-          siteName: data['site_name'] as String?,
+          siteName: data['site_name'] as String,
           address: data['address'] as String?,
           siteStatus: data['site_status'] as String?,
           supervisors: (data['supervisors'] as List<dynamic>?)?.map((supervisor) => supervisor as String).toList(),
           vehicles: (data['vehicles'] as List<dynamic>?)?.map((vehicle) => vehicle as String).toList(),
-          startDate: processedStartDate,
-        endDate: processedEndDate,
+          startDate: formattingUtility.getDateFromLocalDate(data['work_start_date']),
+        endDate: formattingUtility.getDateFromLocalDate(data['work_end_date']),
       );
     }).toList();
     return sites;
@@ -107,4 +105,41 @@ class SiteActions{
     return siteNames;
   }
 
+  Future<bool> updateSite({
+    required String initialSite,
+    required String siteName,
+    required String address,
+    required String siteStatus,
+    required List<String>? vehicles,
+    required List<String>? supervisors,
+    required DateTime? startDate,
+    required DateTime? endDate,
+  }) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/sites/$initialSite/update-site');
+    var siteBody = {
+      'site_name': siteName,
+      'address': address,
+      'site_status': siteStatus,
+      'vehicles': vehicles,
+      'supervisors': supervisors,
+      'work_start_date': '${startDate?.year}-${startDate?.month.toString().padLeft(2, '0')}-${startDate?.day.toString().padLeft(2, '0')}',
+      'work_end_date': (endDate != null) ? '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}' : null,
+    };
+    final headers = {
+      'Content-Type': 'application/json',
+      'X-User-Id': userManager.username,
+    };
+    final response = await http.put(
+      url,
+      headers: headers,
+      body: jsonEncode(siteBody),
+    );
+
+    if(response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

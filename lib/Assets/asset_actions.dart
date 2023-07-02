@@ -62,7 +62,7 @@ class AssetActions{
       'asset_name': assetName,
       'location': location,
       'start_date': '${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}',
-      'end_date': '${endDate?.year}-${endDate?.month.toString().padLeft(2, '0')}-${endDate?.day.toString().padLeft(2, '0')}',
+      'end_date': (endDate != null) ? '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}' : null,
     };
     final headers = {
       'Content-Type': 'application/json',
