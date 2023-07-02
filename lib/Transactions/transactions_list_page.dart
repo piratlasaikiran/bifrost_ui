@@ -256,11 +256,13 @@ class _TransactionListPageState extends State<TransactionListPage> {
     return ListTile(
       title: Row(
         children: [
-          Text(transaction.source),
+          Text(transaction.source,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(width: 6),
           const Icon(Icons.arrow_forward),
           const SizedBox(width: 6),
-          Text(transaction.destination),
+          Text(transaction.destination,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
       subtitle: Column(
@@ -268,6 +270,32 @@ class _TransactionListPageState extends State<TransactionListPage> {
         children: [
           Text('Amount: ${transaction.amount}'),
           Text('Date: ${transaction.transactionDate}'),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Chip(
+                    label: Text(transaction.purpose ?? ''),
+                    backgroundColor: Colors.blue,
+                    labelStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Chip(
+                    label: Text(transaction.mode ?? ''),
+                    backgroundColor: Colors.orange,
+                    labelStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
         ],
       ),
 
