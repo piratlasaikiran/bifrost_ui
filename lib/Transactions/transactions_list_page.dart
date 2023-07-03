@@ -1,4 +1,5 @@
 import 'package:bifrost_ui/Transactions/transaction_actions.dart';
+import 'package:bifrost_ui/Transactions/transaction_state_change.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
@@ -332,7 +333,15 @@ class _TransactionListPageState extends State<TransactionListPage> {
                   );
                 });
               }else if (value == 'change_status') {
-                // Handle view & edit action
+                Future.microtask(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          TransactionStateChange(transaction: transaction),
+                    ),
+                  );
+                });
               }
             },
           ),

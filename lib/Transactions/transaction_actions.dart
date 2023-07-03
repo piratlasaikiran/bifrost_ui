@@ -204,4 +204,44 @@ class TransactionActions{
     }
   }
 
+  Future<bool> updateTransactionStatus({
+    required int transactionId,
+    required String? desiredStatus,
+  }) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/$transactionId/update-transaction-status');
+    var statusChangeRequestBodyBody = {
+      'transaction_id': transactionId,
+      'desired_status': desiredStatus,
+    };
+    final headers = {
+      'Content-Type': 'application/json',
+      'X-User-Id': userManager.username,
+    };
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode(statusChangeRequestBodyBody),
+    );
+    if(response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<Map<String, List<String>>> getStatusChangeMap() async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/state-changes');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    Map<String, dynamic> responseMap = jsonDecode(response.body);
+    Map<String, List<String>> statusChangesMap = {};
+    responseMap.forEach((key, value) {
+      if (value is List) {
+        statusChangesMap[key] = List<String>.from(value);
+      }
+    });
+    return statusChangesMap;
+  }
 }
