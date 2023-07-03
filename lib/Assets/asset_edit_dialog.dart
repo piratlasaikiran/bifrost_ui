@@ -1,25 +1,31 @@
 import 'package:flutter/material.dart';
 
-class AddAssetLocationPopup extends StatefulWidget {
+import '../Utils/formatting_util.dart';
+import 'asset_actions.dart';
+
+class AssetEditDialog extends StatefulWidget {
   final List<String> vehicleList;
   final List<String> supervisorList;
   final List<String> locationList;
+  final AssetDTO asset;
   final Function(String, String, String, DateTime, DateTime?) onAdd;
 
-  const AddAssetLocationPopup({
+  const AssetEditDialog({
     Key? key,
     required this.vehicleList,
     required this.supervisorList,
     required this.locationList,
+    required this.asset,
     required this.onAdd,
   }) : super(key: key);
 
   @override
-  _AddAssetLocationPopupState createState() => _AddAssetLocationPopupState();
+  _AssetEditDialog createState() => _AssetEditDialog();
 }
 
-class _AddAssetLocationPopupState extends State<AddAssetLocationPopup> {
+class _AssetEditDialog extends State<AssetEditDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  FormattingUtility formattingUtility = FormattingUtility();
 
   String? selectedAssetType;
   String? selectedAssetName;
@@ -28,9 +34,25 @@ class _AddAssetLocationPopupState extends State<AddAssetLocationPopup> {
   DateTime? selectedEndDate;
 
   @override
+  void initState() {
+    super.initState();
+    _setInitialData();
+  }
+
+  void _setInitialData(){
+    selectedAssetType = widget.asset.assetType;
+    selectedAssetName = widget.asset.assetName;
+    selectedLocation = widget.asset.location;
+    selectedStartDate = formattingUtility.getDateInDateTimeFormat(widget.asset.startDate);
+    if(widget.asset.endDate!.isNotEmpty){
+      selectedEndDate = formattingUtility.getDateInDateTimeFormat(widget.asset.endDate!) ;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Add Asset Location'),
+      title: const Text('Edit Asset Location'),
       content: Form(
         key: _formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -185,6 +207,7 @@ class _AddAssetLocationPopupState extends State<AddAssetLocationPopup> {
                   });
                 }
               },
+              // initialValue: widget.asset.endDate,
               decoration: const InputDecoration(
                 labelText: 'End Date',
                 suffixIcon: Icon(Icons.calendar_today),
@@ -201,6 +224,13 @@ class _AddAssetLocationPopupState extends State<AddAssetLocationPopup> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: 16),
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
@@ -212,17 +242,11 @@ class _AddAssetLocationPopupState extends State<AddAssetLocationPopup> {
                           selectedEndDate,
                         );
 
+                        // Dismiss the popup
                         Navigator.of(context).pop();
                       }
                     },
-                    child: const Text('Add'),
-                  ),
-                  const SizedBox(width: 16),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Cancel'),
+                    child: const Text('Update'),
                   ),
                 ],
               ),

@@ -53,7 +53,7 @@ class HomePage extends StatelessWidget {
             },
           ),
           ButtonTile(
-            title: 'Current Location',
+            title: 'Asset Management',
             color: Colors.purple,
             icon: Icons.my_location,
             onTap: () {

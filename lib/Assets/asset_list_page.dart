@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../Utils/formatting_util.dart';
 import 'add_asset_location.dart';
 import 'asset_actions.dart';
+import 'asset_edit_dialog.dart';
 
 class AssetListPage extends StatefulWidget {
   final List<AssetDTO> assets;
@@ -19,6 +20,9 @@ class AssetListPage extends StatefulWidget {
 class _AssetListPageState extends State<AssetListPage> {
 
   FormattingUtility formattingUtility = FormattingUtility();
+  VehicleActions vehicleActions = VehicleActions();
+  SupervisorActions supervisorActions = SupervisorActions();
+  SiteActions siteActions = SiteActions();
 
   List<AssetDTO> filteredAssets = [];
   TextEditingController assetNameController = TextEditingController();
@@ -27,10 +31,41 @@ class _AssetListPageState extends State<AssetListPage> {
   DateTime? startDate;
   DateTime? endDate;
 
+  List<String> vehicleList = [];
+  List<String> supervisorList = [];
+  List<String> siteList = [];
+
   @override
   void initState() {
     super.initState();
     filteredAssets = widget.assets;
+    _fetchVehicles();
+    _fetchSupervisors();
+    _fetchSites();
+  }
+
+  Future<void> _fetchVehicles() async {
+    VehicleActions vehicleActions = VehicleActions();
+    final vehicles = await vehicleActions.getVehicleNumbers();
+    setState(() {
+      vehicleList = vehicles;
+    });
+  }
+
+  Future<void> _fetchSupervisors() async {
+    SupervisorActions supervisorActions = SupervisorActions();
+    final supervisors = await supervisorActions.getSupervisorNames();
+    setState(() {
+      supervisorList = supervisors;
+    });
+  }
+
+  void _fetchSites() async {
+    SiteActions siteActions = SiteActions();
+    final sites = await siteActions.getSiteNames();
+    setState(() {
+      siteList = sites;
+    });
   }
 
   @override
@@ -53,7 +88,7 @@ class _AssetListPageState extends State<AssetListPage> {
         final location = asset.location.toLowerCase();
 
         final isStartDateValid = startDate == null || formattingUtility.getDateInDateTimeFormat(asset.startDate).isAfter(startDate!);
-        final isEndDateValid = endDate == null || formattingUtility.getDateInDateTimeFormat(asset.endDate).isBefore(endDate!);
+        final isEndDateValid = endDate == null || formattingUtility.getDateInDateTimeFormat(asset.endDate!).isBefore(endDate!);
 
         return assetName.contains(filterAssetName) &&
             assetType.contains(filterAssetType) &&
@@ -64,14 +99,74 @@ class _AssetListPageState extends State<AssetListPage> {
     });
   }
 
-  Future<void> showAddAssetLocationPopup() async {
-    VehicleActions vehicleActions = VehicleActions();
-    SupervisorActions supervisorActions = SupervisorActions();
-    SiteActions siteActions = SiteActions();
+  Future<void> editAssetLocationPopup(AssetDTO asset) async {
+    Future.microtask(() {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) =>
+            AssetEditDialog(
+              vehicleList: vehicleList,
+              supervisorList: supervisorList,
+              locationList: siteList,
+              asset: asset,
+              onAdd: (assetType, assetName, location, startDate, endDate) async {
+                AssetActions assetActions = AssetActions();
+                final result = await assetActions.updateAssetLocation(
+                    assetLocationId: asset.assetLocationId,
+                    assetType: assetType,
+                    assetName: assetName,
+                    location: location,
+                    startDate: startDate,
+                    endDate: endDate);
+                if (result) {
+                  // Show success popup
+                  Future.microtask(() {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Success'),
+                          content: const Text('AssetLocation edited successfully.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  });
+                } else {
+                  Future.microtask(() {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Failure'),
+                          content: const Text('Failed to edit AssetLocation.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  });
+                }
+              },
+            ),
+      );
+    });
+  }
 
-    List<String> vehicleList = await vehicleActions.getVehicleNumbers();
-    List<String> supervisorList = await supervisorActions.getSupervisorNames();
-    List<String> locationList = await siteActions.getSiteNames();
+  Future<void> showAddAssetLocationPopup() async {
     Future.microtask(() {
       showDialog(
         context: context,
@@ -79,7 +174,7 @@ class _AssetListPageState extends State<AssetListPage> {
           AddAssetLocationPopup(
             vehicleList: vehicleList,
             supervisorList: supervisorList,
-            locationList: locationList,
+            locationList: siteList,
             onAdd: (assetType, assetName, location, startDate, endDate) async {
               AssetActions assetActions = AssetActions();
               final result = await assetActions.saveAssetLocation(
@@ -157,9 +252,7 @@ class _AssetListPageState extends State<AssetListPage> {
             onSelected: (value) {
               if (value == 'add_asset_location') {
                 showAddAssetLocationPopup();
-              } else if (value == 'add_asset_ownership') {
-                // Implement asset ownership pop up
-              }else if (value == 'reset_filters') {
+              } else if (value == 'reset_filters') {
                 resetFilters();
               }
             },
@@ -168,10 +261,6 @@ class _AssetListPageState extends State<AssetListPage> {
                 const PopupMenuItem<String>(
                   value: 'add_asset_location',
                   child: Text('Add Asset Location'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'add_asset_ownership',
-                  child: Text('Add Asset Ownership'),
                 ),
                 const PopupMenuItem<String>(
                   value: 'reset_filters',
@@ -301,7 +390,9 @@ class _AssetListPageState extends State<AssetListPage> {
                       trailing: PopupMenuButton<String>(
                         onSelected: (value) {
                           if (value == 'view_edit') {
-                            // Handle View and Edit action
+                            Future.microtask(() {
+                              editAssetLocationPopup(asset);
+                            });
                           }
                         },
                         itemBuilder: (context) {

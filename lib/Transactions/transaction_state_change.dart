@@ -12,7 +12,6 @@ class TransactionStateChange extends StatefulWidget {
 }
 
 class _TransactionStateChange extends State<TransactionStateChange> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TransactionActions transactionActions = TransactionActions();
 
   String? _selectedStatus;
