@@ -1,5 +1,8 @@
+import 'package:bifrost_ui/BankAccounts/passbook_actions.dart';
 import 'package:bifrost_ui/Employees/manage_employees_page.dart';
 import 'package:flutter/material.dart';
+
+import '../BankAccounts/passbook_main_page_list.dart';
 
 class EmployeeOptionsPage extends StatelessWidget {
   const EmployeeOptionsPage({super.key});
@@ -31,9 +34,18 @@ class EmployeeOptionsPage extends StatelessWidget {
             const SizedBox(height: 16.0),
             _buildCircularButton(
               icon: Icons.account_balance_wallet,
-              label: 'Pending Balances',
-              onTap: () {
-                // perform action when pending balance is clicked
+              label: 'CashBooks',
+              onTap: () async {
+                PassBookActions passBookActions = PassBookActions();
+                List<PassBookDTO> passBookDTOs = await passBookActions.getAllPassBookMainPages();
+                Future.microtask(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PassBookMainPageListPage(passBookMainPages: passBookDTOs),
+                    ),
+                  );
+                });
               },
               color: Colors.blue,
               borderColor: Colors.white,

@@ -1,18 +1,24 @@
 import 'dart:io';
 
-import 'package:bifrost_ui/Employees/Driver/driver_actions.dart';
+import 'package:bifrost_ui/Employees/Supervisor/supervisor_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class DriverInputDialog extends StatefulWidget {
-  const DriverInputDialog({super.key});
+import '../../BankAccounts/bank_account_actions.dart';
+
+class SupervisorEditDialog extends StatefulWidget {
+  final SupervisorDTO supervisor;
+
+  const SupervisorEditDialog({Key? key, required this.supervisor}) : super(key: key);
 
   @override
-  _DriverInputDialogState createState() => _DriverInputDialogState();
+  _SupervisorEditDialogState createState() => _SupervisorEditDialogState();
 }
 
-class _DriverInputDialogState extends State<DriverInputDialog> {
+class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  SupervisorActions supervisorActions = SupervisorActions();
+  BankAccountActions bankAccountActions = BankAccountActions();
   late BuildContext dialogContext;
 
   String? _name;
@@ -21,11 +27,35 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
   double? _salary;
   bool _admin = false;
   File? _aadharImage;
-  File? _licenseImage;
-  double? _otPayDay;
-  double? _otPayDayNight;
+  String? _companyMobileNumber;
+  String? _atmCardNumber;
+  double? _otPay;
 
-  Future<void> _saveDriver() async {
+  List<String> availableATMCards = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAadhar();
+    _fetchATMCards();
+  }
+
+  Future<void> _fetchAadhar() async {
+    final aadharImage = await supervisorActions.getAadhar(widget.supervisor.name);
+    setState(() {
+      _aadharImage = aadharImage;
+    });
+  }
+
+  void _fetchATMCards() async {
+    final atmCards = await bankAccountActions.getATMCards();
+    setState(() {
+      availableATMCards = atmCards;
+      _atmCardNumber = availableATMCards.firstWhere((card) => card == widget.supervisor.atmCardNumber.toString(),  orElse: () => '');
+    });
+  }
+
+  Future<void> _updateSupervisor() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -48,35 +78,16 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
         return;
       }
 
-      if (_licenseImage == null) {
-        showDialog(
-          context: dialogContext,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('License Upload'),
-              content: const Text('Please upload license image.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-        return;
-      }
-
-      DriverActions supervisorActions = DriverActions();
-      final result = await supervisorActions.saveDriver(name: _name,
+      final result = await supervisorActions.updateSupervisor(existingSupervisor: widget.supervisor.name,
+          name: _name,
           mobileNumber: _mobileNumber,
           bankAccountNumber: _bankAccountNumber,
           salary: _salary,
           isAdmin: _admin,
           aadhar: _aadharImage,
-          license: _licenseImage,
-          otPayDay: _otPayDay,
-          otPayDayNight: _otPayDayNight);
+          companyMobileNumber: _companyMobileNumber,
+          atmCard: _atmCardNumber,
+          otPay: _otPay);
       if (result) {
         // Show success popup
         Future.microtask(() {
@@ -85,7 +96,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Success'),
-                content: const Text('Driver saved successfully.'),
+                content: const Text('Supervisor updated successfully.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -99,6 +110,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
             },
           );
         });
+        supervisorActions.deleteTemporaryLocation(_aadharImage!);
       } else {
         Future.microtask(() {
           showDialog(
@@ -106,7 +118,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Failure'),
-                content: const Text('Failed to save driver.'),
+                content: const Text('Failed to update supervisor.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -132,24 +144,9 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
     }
   }
 
-  void _pickLicenseImage(ImageSource source) async {
-    final pickedImage = await ImagePicker().pickImage(source: source);
-    if (pickedImage != null) {
-      setState(() {
-        _licenseImage = File(pickedImage.path);
-      });
-    }
-  }
-
   void _removeAadharImage() {
     setState(() {
       _aadharImage = null;
-    });
-  }
-
-  void _removeLicenseImage() {
-    setState(() {
-      _licenseImage = null;
     });
   }
 
@@ -206,63 +203,10 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
     }
   }
 
-  Widget _buildLicenseImageWidget() {
-    if (_licenseImage != null) {
-      return Column(
-        children: [
-          Image.file(
-            _licenseImage!,
-            width: 100,
-            height: 100,
-          ),
-          ElevatedButton(
-            onPressed: _removeLicenseImage,
-            child: const Text('Remove License Image'),
-          ),
-        ],
-      );
-    } else {
-      return TextButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: const Text('Select License Image'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                      leading: const Icon(Icons.photo_library),
-                      title: const Text('Pick from Gallery'),
-                      onTap: () {
-                        _pickLicenseImage(ImageSource.gallery);
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.camera_alt),
-                      title: const Text('Take a Picture'),
-                      onTap: () {
-                        _pickLicenseImage(ImageSource.camera);
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        },
-        child: const Text('Upload License Image'),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Enter Driver Details'),
+      title: const Text('Enter Supervisor Details'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -272,6 +216,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Name',
                 ),
+                initialValue: widget.supervisor.name,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a name';
@@ -286,6 +231,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Mobile Number',
                 ),
+                initialValue: widget.supervisor.mobileNumber.toString(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a mobile number';
@@ -303,6 +249,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Bank Account Number',
                 ),
+                initialValue: widget.supervisor.bankAccountNumber,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a bank account number';
@@ -318,6 +265,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
                   labelText: 'Salary',
                 ),
                 keyboardType: TextInputType.number,
+                initialValue: widget.supervisor.salary.toString(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter salary';
@@ -334,7 +282,7 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
               ),
               SwitchListTile(
                 title: const Text('Admin'),
-                value: _admin,
+                value: widget.supervisor.admin!,
                 onChanged: (value) {
                   setState(() {
                     _admin = value;
@@ -342,43 +290,64 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
                 },
               ),
               _buildAadharImageWidget(),
-              _buildLicenseImageWidget(),
               TextFormField(
                 decoration: const InputDecoration(
-                  labelText: 'OT Pay Day',
+                  labelText: 'Company Mobile Number',
                 ),
-                keyboardType: TextInputType.number,
+                initialValue: widget.supervisor.companyMobileNumber.toString(),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter OT pay for day';
-                  }
-                  double? otPay = double.tryParse(value);
-                  if (otPay == null || otPay <= 0) {
-                    return 'Invalid OT pay for day';
+                  if (value != null && value.isNotEmpty) {
+                    if (value.length != 10 || int.tryParse(value) == null) {
+                      return 'Invalid company mobile number';
+                    }
                   }
                   return null;
                 },
                 onSaved: (value) {
-                  _otPayDay = double.tryParse(value!);
+                  _companyMobileNumber = value;
                 },
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 14.0),
+                child: Row(
+                  children: [
+                    const Text('ATM Card'),
+                    const SizedBox(width: 10),
+                    DropdownButton<String>(
+                      value: _atmCardNumber,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _atmCardNumber = newValue!;
+                        });
+                      },
+                      items: availableATMCards.map((String atmCard) {
+                        return DropdownMenuItem<String>(
+                          value: atmCard,
+                          child: Text(atmCard),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
               ),
               TextFormField(
                 decoration: const InputDecoration(
-                  labelText: 'OT Pay Day&Night',
+                  labelText: 'OT Pay',
                 ),
                 keyboardType: TextInputType.number,
+                initialValue: widget.supervisor.otPay.toString(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter OT pay for day&night';
+                    return 'Please enter OT pay';
                   }
                   double? otPay = double.tryParse(value);
                   if (otPay == null || otPay <= 0) {
-                    return 'Invalid OT pay for Day&Night';
+                    return 'Invalid OT pay';
                   }
                   return null;
                 },
                 onSaved: (value) {
-                  _otPayDayNight = double.tryParse(value!);
+                  _otPay = double.tryParse(value!);
                 },
               ),
             ],
@@ -395,9 +364,9 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
         ElevatedButton(
           onPressed: (){
             dialogContext = context;
-            _saveDriver();
+            _updateSupervisor();
           },
-          child: const Text('Save'),
+          child: const Text('Update'),
         ),
       ],
     );

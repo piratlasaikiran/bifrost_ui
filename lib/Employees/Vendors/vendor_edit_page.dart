@@ -8,14 +8,16 @@ import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
 import '../../Sites/site_actions.dart';
 
-class VendorInputDialog extends StatefulWidget {
-  const VendorInputDialog({Key? key}) : super(key: key);
+class VendorEditDialog extends StatefulWidget {
+  final VendorDTO vendor;
+
+  const VendorEditDialog({Key? key, required this.vendor}) : super(key: key);
 
   @override
-  _VendorInputDialogState createState() => _VendorInputDialogState();
+  _VendorEditDialogState createState() => _VendorEditDialogState();
 }
 
-class _VendorInputDialogState extends State<VendorInputDialog> {
+class _VendorEditDialogState extends State<VendorEditDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   VendorActions vendorActions = VendorActions();
 
@@ -24,7 +26,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
   String? _selectedLocation;
   List<String> _selectedPurposes = [];
   File? _contractDocument;
-  final Map<String, int> _selectedCommodities = {};
+  Map<String, int> _selectedCommodities = {};
 
   List<String> _locationList = [];
   List<String> _purposeList = [];
@@ -37,6 +39,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
     _fetchLocationList();
     _fetchPurposeList();
     _fetchCommodityBaseUnits();
+    _fetchContractDoc();
   }
 
   void _fetchLocationList() async {
@@ -44,6 +47,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
     final locations = await siteActions.getSiteNames();
     setState(() {
       _locationList = locations;
+      _selectedLocation = widget.vendor.location;
     });
   }
 
@@ -51,6 +55,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
     final purposes = await vendorActions.getVendorPurposes();
     setState(() {
       _purposeList = purposes;
+      _selectedPurposes = widget.vendor.purposes;
     });
   }
 
@@ -58,10 +63,18 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
     final commodityBaseUnits = await vendorActions.getCommodityBaseUnits();
     setState(() {
       _commodityBaseUnitMap = commodityBaseUnits;
+      _selectedCommodities = widget.vendor.commodityCosts;
     });
   }
 
-  Future<void> _saveVendor() async {
+  Future<void> _fetchContractDoc() async {
+    final contractDocImage = await vendorActions.getContractDoc(widget.vendor.vendorId);
+    setState(() {
+      _contractDocument = contractDocImage;
+    });
+  }
+
+  Future<void> _updateVendor() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -84,7 +97,8 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
         return;
       }
 
-      final result = await vendorActions.saveVendor(
+      final result = await vendorActions.updateVendor(
+          existingVendorId: widget.vendor.vendorId,
           vendorId: _vendorId,
           mobileNumber: _mobileNumber,
           location: _selectedLocation,
@@ -99,7 +113,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Success'),
-                content: const Text('Vendor saved successfully.'),
+                content: const Text('Vendor updated successfully.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -113,6 +127,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
             },
           );
         });
+        vendorActions.deleteTemporaryLocation(_contractDocument!);
       } else {
         Future.microtask(() {
           showDialog(
@@ -120,7 +135,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Failure'),
-                content: const Text('Failed to save vendor.'),
+                content: const Text('Failed to update vendor.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -317,6 +332,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
             children: [
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Vendor ID'),
+                initialValue: widget.vendor.vendorId,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a vendor ID';
@@ -355,6 +371,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
                   labelText: 'Mobile Number',
                 ),
                 keyboardType: TextInputType.number,
+                initialValue: widget.vendor.mobileNumber.toString(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a mobile number';
@@ -376,6 +393,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
                     .map((mode) => MultiSelectItem<String>(mode, mode))
                     .toList(),
                 listType: MultiSelectListType.CHIP,
+                initialValue: widget.vendor.purposes,
                 onConfirm: (List<String> values) {
                   setState(() {
                     _selectedPurposes = values;
@@ -427,7 +445,7 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
           child: const Text('Cancel'),
         ),
         ElevatedButton(
-          onPressed: _saveVendor,
+          onPressed: _updateVendor,
           child: const Text('Save'),
         ),
       ],

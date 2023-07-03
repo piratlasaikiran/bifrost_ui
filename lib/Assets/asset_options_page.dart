@@ -35,6 +35,15 @@ class AssetOptionsPage extends StatelessWidget {
               borderColor: Colors.white,
             ),
             const SizedBox(height: 16.0),
+            _buildCircularButton(
+              icon: Icons.directions_bike,
+              label: 'Vehicle Ownership',
+              onTap: () {
+                // Implement Vehicle Ownership flow
+              },
+              color: Colors.blue,
+              borderColor: Colors.white,
+            ),
           ],
         ),
       ),

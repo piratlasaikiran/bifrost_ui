@@ -7,7 +7,6 @@ class FormattingUtility{
     int dayOfMonth = localDateFormatMap['dayOfMonth'];
     DateTime date = DateTime(year, month, dayOfMonth);
     return DateFormat('dd-MM-yyyy').format(date);
-
   }
 
   String getDateFromDateTime(DateTime dateTime){

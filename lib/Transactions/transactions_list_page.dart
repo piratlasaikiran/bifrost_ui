@@ -1,4 +1,5 @@
 import 'package:bifrost_ui/Transactions/transaction_actions.dart';
+import 'package:bifrost_ui/Transactions/transaction_state_change.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
@@ -9,6 +10,8 @@ import '../BankAccounts/bank_account_actions.dart';
 import '../Employees/Driver/driver_actions.dart';
 import '../Employees/Supervisor/supervisor_actions.dart';
 import '../Employees/Vendors/vendor_actions.dart';
+import '../Utils/formatting_util.dart';
+import 'edit_transaction_dialog.dart';
 
 class TransactionListPage extends StatefulWidget {
   final List<TransactionDTO> transactions;
@@ -22,6 +25,7 @@ class TransactionListPage extends StatefulWidget {
 class _TransactionListPageState extends State<TransactionListPage> {
   TransactionActions transactionActions = TransactionActions();
   SupervisorActions supervisorActions = SupervisorActions();
+  FormattingUtility formattingUtility = FormattingUtility();
 
   List<TransactionDTO> filteredTransactions = [];
   int filterAmount = 0;
@@ -53,6 +57,7 @@ class _TransactionListPageState extends State<TransactionListPage> {
     _fetchBankAccounts();
     _fetchSources();
     _fetchDestinations();
+    _fetchAvailableStatuses();
     filteredTransactions = widget.transactions;
   }
 
@@ -67,6 +72,13 @@ class _TransactionListPageState extends State<TransactionListPage> {
     final transactionModes = await transactionActions.getModes();
     setState(() {
       availableModes = transactionModes;
+    });
+  }
+
+  void _fetchAvailableStatuses() async {
+    final transactionStatuses = await transactionActions.getStatuses();
+    setState(() {
+      availableStatuses = transactionStatuses;
     });
   }
 
@@ -111,17 +123,17 @@ class _TransactionListPageState extends State<TransactionListPage> {
             selectedDestinations.contains(transaction.destination.toLowerCase());
         final isAmountMatch = filterAmount == 0 || transaction.amount == filterAmount;
         final isModeMatch = selectedModes.isEmpty ||
-            selectedModes.contains(transaction.mode.toLowerCase());
+            selectedModes.contains(transaction.mode);
         final isStatusMatch = selectedStatues.isEmpty ||
-            selectedStatues.contains(transaction.status.toLowerCase());
+            selectedStatues.contains(transaction.status);
         final isBankAccountMatch = selectedBankAccounts.isEmpty ||
-            selectedBankAccounts.contains(transaction.bankAccount!.toLowerCase());
+            selectedBankAccounts.contains(transaction.bankAccount!);
         final isPurposeMatch = selectedPurposes.isEmpty ||
-            selectedPurposes.contains(transaction.purpose.toLowerCase());
+            selectedPurposes.contains(transaction.purpose);
         final isTransactionStartDateMatch =
-            filterTransactionStartDate == null || transaction.transactionDate == filterTransactionStartDate;
+            filterTransactionStartDate == null || formattingUtility.getDateInDateTimeFormat(transaction.transactionDate).isAfter(filterTransactionStartDate!);
         final isTransactionEndDateMatch =
-            filterTransactionEndDate == null || transaction.transactionDate == filterTransactionEndDate;
+            filterTransactionEndDate == null || formattingUtility.getDateInDateTimeFormat(transaction.transactionDate).isBefore(filterTransactionEndDate!);
 
         return isSourceMatch &&
             isDestinationMatch &&
@@ -205,8 +217,8 @@ class _TransactionListPageState extends State<TransactionListPage> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: Colors.blue, // Head color
-            hintColor: Colors.blue, // Selection color
+            primaryColor: Colors.blue,
+            hintColor: Colors.blue,
             colorScheme: const ColorScheme.light(primary: Colors.blue),
             buttonTheme: const ButtonThemeData(
               textTheme: ButtonTextTheme.primary,
@@ -246,17 +258,46 @@ class _TransactionListPageState extends State<TransactionListPage> {
     return ListTile(
       title: Row(
         children: [
-          Text(transaction.source),
+          Text(transaction.source,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(width: 6),
           const Icon(Icons.arrow_forward),
           const SizedBox(width: 6),
-          Text(transaction.destination),
+          Text(transaction.destination,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Amount: ${transaction.amount}'),
+          Text('Date: ${transaction.transactionDate}'),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Chip(
+                    label: Text(transaction.purpose ?? ''),
+                    backgroundColor: Colors.blue,
+                    labelStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Chip(
+                    label: Text(transaction.mode ?? ''),
+                    backgroundColor: Colors.orange,
+                    labelStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
         ],
       ),
 
@@ -282,9 +323,25 @@ class _TransactionListPageState extends State<TransactionListPage> {
             ],
             onSelected: (value) {
               if (value == 'view_edit') {
-                // Handle view & edit action
+                Future.microtask(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          EditTransactionDialog(transaction: transaction),
+                    ),
+                  );
+                });
               }else if (value == 'change_status') {
-                // Handle view & edit action
+                Future.microtask(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          TransactionStateChange(transaction: transaction),
+                    ),
+                  );
+                });
               }
             },
           ),

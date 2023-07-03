@@ -10,17 +10,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:image_picker/image_picker.dart';
 
-class AddTransactionDialog extends StatefulWidget {
-  const AddTransactionDialog({super.key});
+import '../Utils/formatting_util.dart';
+
+class EditTransactionDialog extends StatefulWidget {
+  final TransactionDTO transaction;
+
+  const EditTransactionDialog({Key? key, required this.transaction}) : super(key: key);
 
 
   @override
-  _AddTransactionDialogState createState() => _AddTransactionDialogState();
+  _EditTransactionDialogState createState() => _EditTransactionDialogState();
 }
 
-class _AddTransactionDialogState extends State<AddTransactionDialog> {
+class _EditTransactionDialogState extends State<EditTransactionDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TransactionActions transactionActions = TransactionActions();
+  FormattingUtility formattingUtility = FormattingUtility();
 
   String? _selectedSource;
   String? _selectedDestination;
@@ -32,8 +37,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   DateTime? _transactionDate;
   String? _remarks;
 
-  final _tnxSourceController = TextEditingController();
-  final _tnxDestinationController = TextEditingController();
+  TextEditingController _tnxSourceController = TextEditingController();
+  TextEditingController _tnxDestinationController = TextEditingController();
 
   List<String> _sources = [];
   List<String> _destinations = [];
@@ -50,6 +55,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     _fetchSources();
     _fetchDestinations();
     _selectedBankAccount = 'My Account';
+    _setInitialData();
+    _fetchBill();
   }
 
   void _fetchTransactionPurposes() async {
@@ -100,19 +107,35 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     });
   }
 
-  Future<void> _saveTransaction() async {
+  Future<void> _fetchBill() async {
+    final billImage = await transactionActions.getBill(widget.transaction.transactionId);
+    setState(() {
+      _bill = billImage;
+    });
+  }
+
+  void _setInitialData(){
+    setState(() {
+      _tnxSourceController.text = widget.transaction.source;
+      _tnxDestinationController.text = widget.transaction.destination;
+      _transactionDate = formattingUtility.getDateInDateTimeFormat(widget.transaction.transactionDate);
+    });
+  }
+
+  Future<void> _updateTransaction() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      final result = await transactionActions.saveTransaction(
-          source: _selectedSource,
-          destination: _selectedDestination,
-          amount: _amount,
-          bill: _bill,
-          purpose: _selectedPurpose,
-          mode: _selectedMode,
-          bankAccount: _selectedBankAccount,
-          transactionDate: _transactionDate,
-          remarks: _remarks);
+      final result = await transactionActions.updateTransaction(
+        transactionId: widget.transaction.transactionId,
+        source: _selectedSource,
+        destination: _selectedDestination,
+        amount: _amount,
+        bill: _bill,
+        purpose: _selectedPurpose,
+        mode: _selectedMode,
+        bankAccount: _selectedBankAccount,
+        transactionDate: _transactionDate,
+        remarks: _remarks);
 
       if(result){
         Future.microtask(() {
@@ -121,7 +144,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Success'),
-                content: const Text('Transaction saved successfully.'),
+                content: const Text('Transaction edited successfully.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -134,6 +157,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               );
             },
           );
+          transactionActions.deleteTemporaryLocation(_bill!);
         });
       } else {
         Future.microtask(() {
@@ -142,7 +166,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Failure'),
-                content: const Text('Failed to save transaction.'),
+                content: const Text('Failed to edit transaction.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -261,7 +285,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Add Transaction'),
+      title: const Text('Edit Transaction'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -410,6 +434,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                   });
                 },
                 decoration: const InputDecoration(labelText: 'Amount *'),
+                initialValue: widget.transaction.amount.toString(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter an amount';
@@ -421,7 +446,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 },
               ),
               DropdownButtonFormField<String>(
-                value: _selectedPurpose,
+                value: widget.transaction.purpose,
                 onChanged: (value) {
                   setState(() {
                     _selectedPurpose = value;
@@ -464,12 +489,12 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                   ),
                   IconButton(
                     onPressed: _selectTransactionDate,
-                    icon: const Icon(Icons.calendar_today),
+                    icon: const Icon(Icons.calendar_month),
                   ),
                 ],
               ),
               DropdownButtonFormField<String>(
-                value: _selectedMode,
+                value: widget.transaction.mode,
                 onChanged: (value) {
                   setState(() {
                     _selectedMode = value;
@@ -490,7 +515,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 },
               ),
               DropdownButtonFormField<String>(
-                value: _selectedBankAccount,
+                value: widget.transaction.bankAccount,
                 onChanged: (value) {
                   setState(() {
                     _selectedBankAccount = value;
@@ -508,6 +533,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Remarks',
                 ),
+                initialValue: widget.transaction.remarks,
                 onChanged: (value) {
                   _remarks = value;
                 },
@@ -525,9 +551,9 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
         ),
         ElevatedButton(
           onPressed: () {
-            _saveTransaction();
+            _updateTransaction();
           },
-          child: const Text('Save'),
+          child: const Text('Update'),
         ),
       ],
     );

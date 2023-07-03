@@ -4,19 +4,23 @@ import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
-class AddSiteDialog extends StatefulWidget {
-  const AddSiteDialog({Key? key}) : super(key: key);
+import '../Utils/formatting_util.dart';
+
+class EditSiteDialog extends StatefulWidget {
+  final SiteDTO site;
+
+  const EditSiteDialog({Key? key, required this.site}) : super(key: key);
 
   @override
-  _AddSiteDialogState createState() => _AddSiteDialogState();
+  _EditSiteDialogState createState() => _EditSiteDialogState();
 }
 
-class _AddSiteDialogState extends State<AddSiteDialog> {
+class _EditSiteDialogState extends State<EditSiteDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late BuildContext dialogContext;
+  FormattingUtility formattingUtility = FormattingUtility();
+  SiteActions siteActions = SiteActions();
 
-  final TextEditingController _siteNameController = TextEditingController();
-  final TextEditingController _siteAddressController = TextEditingController();
   late String _siteName;
   late String _siteAddress;
   DateTime? _startDate;
@@ -29,14 +33,13 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
   List<String> _supervisors = [];
   List<String> _statusOptions = [];
 
-  SiteActions siteActions = SiteActions();
-
   @override
   void initState() {
     super.initState();
     _fetchVehicles();
     _fetchSupervisors();
     _fetchStatusOptions();
+    _setInitialValues();
   }
 
   Future<void> _fetchVehicles() async {
@@ -63,6 +66,16 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
     });
   }
 
+  void _setInitialValues(){
+    setState(() {
+      _startDate = formattingUtility.getDateInDateTimeFormat(widget.site.startDate);
+      _endDate = formattingUtility.getDateInDateTimeFormat(widget.site.endDate);
+      _selectedIncharges = widget.site.supervisors!;
+      _selectedVehicles = widget.site.vehicles!;
+      _selectedStatus = widget.site.siteStatus;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -74,10 +87,10 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextFormField(
-                controller: _siteNameController,
                 decoration: const InputDecoration(
                   labelText: 'Site Name',
                 ),
+                initialValue: widget.site.siteName,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter site name';
@@ -89,10 +102,10 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
                 },
               ),
               TextFormField(
-                controller: _siteAddressController,
                 decoration: const InputDecoration(
                   labelText: 'Site Address',
                 ),
+                initialValue: widget.site.address,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter site address';
@@ -104,7 +117,7 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
                 },
               ),
               DropdownButtonFormField<String>(
-                value: _selectedStatus,
+                value: widget.site.siteStatus,
                 onChanged: (value) {
                   setState(() {
                     _selectedStatus = value!;
@@ -117,6 +130,7 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
                   );
                 }).toList(),
                 decoration: const InputDecoration(labelText: 'Site Status'),
+
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please select site status';
@@ -186,6 +200,7 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
                         labelText: 'Work End Date',
                       ),
                       onTap: _showEndDatePicker,
+                      // initialValue: widget.site.endDate,
                       readOnly: true,
                       controller: TextEditingController(
                         text: _endDate != null ? _endDate.toString() : '',
@@ -193,7 +208,7 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
                     ),
                   ),
                   IconButton(
-                    onPressed: _showEndDatePicker,
+                    onPressed: _showStartDatePicker,
                     icon: const Icon(Icons.calendar_month),
                   ),
                 ],
@@ -210,15 +225,11 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
           child: const Text('Cancel'),
         ),
         ElevatedButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              _formKey.currentState!.save();
-              dialogContext = context;
-              _saveSiteData();
-              // Navigator.pop(context);
-            }
+          onPressed: (){
+            dialogContext = context;
+            _updateSiteData();
           },
-          child: const Text('Save'),
+          child: const Text('Update'),
         ),
       ],
     );
@@ -280,59 +291,61 @@ class _AddSiteDialogState extends State<AddSiteDialog> {
     }
   }
 
-  Future<void> _saveSiteData() async {
+  Future<void> _updateSiteData() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      final result = await siteActions.updateSite(
+          initialSite: widget.site.siteName!,
+          siteName: _siteName,
+          address: _siteAddress,
+          siteStatus: _selectedStatus!,
+          vehicles: _selectedVehicles,
+          supervisors: _selectedIncharges,
+          startDate: _startDate,
+          endDate: _endDate);
 
-    SiteActions siteActions = SiteActions();
-    final result = await siteActions.saveSite(siteName: _siteName,
-        address: _siteAddress,
-        siteStatus: _selectedStatus!,
-        vehicles: _selectedVehicles,
-        supervisors: _selectedIncharges,
-        startDate: _startDate,
-        endDate: _endDate);
-
-    if (result) {
-      // Show success popup
-      Future.microtask(() {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Success'),
-              content: const Text('Site saved successfully.'),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(dialogContext).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      });
-    } else {
-      Future.microtask(() {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Failure'),
-              content: const Text('Failed to save site.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      });
+      if (result) {
+        Future.microtask(() {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Success'),
+                content: const Text('Site updated successfully.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(dialogContext).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        });
+      } else {
+        Future.microtask(() {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Failure'),
+                content: const Text('Failed to update site.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        });
+      }
     }
   }
 }
