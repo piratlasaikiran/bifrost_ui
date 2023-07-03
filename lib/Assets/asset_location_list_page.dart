@@ -6,25 +6,25 @@ import 'package:intl/intl.dart';
 import '../Utils/formatting_util.dart';
 import 'add_asset_location.dart';
 import 'asset_actions.dart';
-import 'asset_edit_dialog.dart';
+import 'asset_location_edit_dialog.dart';
 
-class AssetListPage extends StatefulWidget {
-  final List<AssetDTO> assets;
+class AssetLocationListPage extends StatefulWidget {
+  final List<AssetLocationDTO> assetLocations;
 
-  const AssetListPage({Key? key, required this.assets}) : super(key: key);
+  const AssetLocationListPage({Key? key, required this.assetLocations}) : super(key: key);
 
   @override
-  _AssetListPageState createState() => _AssetListPageState();
+  _AssetLocationListPageState createState() => _AssetLocationListPageState();
 }
 
-class _AssetListPageState extends State<AssetListPage> {
+class _AssetLocationListPageState extends State<AssetLocationListPage> {
 
   FormattingUtility formattingUtility = FormattingUtility();
   VehicleActions vehicleActions = VehicleActions();
   SupervisorActions supervisorActions = SupervisorActions();
   SiteActions siteActions = SiteActions();
 
-  List<AssetDTO> filteredAssets = [];
+  List<AssetLocationDTO> filteredAssets = [];
   TextEditingController assetNameController = TextEditingController();
   TextEditingController assetTypeController = TextEditingController();
   TextEditingController locationController = TextEditingController();
@@ -38,7 +38,7 @@ class _AssetListPageState extends State<AssetListPage> {
   @override
   void initState() {
     super.initState();
-    filteredAssets = widget.assets;
+    filteredAssets = widget.assetLocations;
     _fetchVehicles();
     _fetchSupervisors();
     _fetchSites();
@@ -82,7 +82,7 @@ class _AssetListPageState extends State<AssetListPage> {
       final filterAssetType = assetTypeController.text.toLowerCase();
       final filterLocation = locationController.text.toLowerCase();
 
-      filteredAssets = widget.assets.where((asset) {
+      filteredAssets = widget.assetLocations.where((asset) {
         final assetName = asset.assetName.toLowerCase();
         final assetType = asset.assetType.toLowerCase();
         final location = asset.location.toLowerCase();
@@ -99,12 +99,12 @@ class _AssetListPageState extends State<AssetListPage> {
     });
   }
 
-  Future<void> editAssetLocationPopup(AssetDTO asset) async {
+  Future<void> editAssetLocationPopup(AssetLocationDTO asset) async {
     Future.microtask(() {
       showDialog(
         context: context,
         builder: (BuildContext context) =>
-            AssetEditDialog(
+            AssetLocationEditDialog(
               vehicleList: vehicleList,
               supervisorList: supervisorList,
               locationList: siteList,
@@ -238,7 +238,7 @@ class _AssetListPageState extends State<AssetListPage> {
       locationController.clear();
       startDate = null;
       endDate = null;
-      filteredAssets = widget.assets;
+      filteredAssets = widget.assetLocations;
     });
   }
 
@@ -361,7 +361,7 @@ class _AssetListPageState extends State<AssetListPage> {
                       padding: const EdgeInsets.only(right: 20.0),
                       child: InputDecorator(
                         decoration: const InputDecoration(
-                          labelText: 'Start Date',
+                          labelText: 'End Date',
                           suffixIcon: Icon(Icons.calendar_today),
                         ),
                         child: Text(

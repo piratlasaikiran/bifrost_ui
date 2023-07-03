@@ -1,58 +1,35 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../Utils/formatting_util.dart';
-import 'asset_actions.dart';
-
-class AssetEditDialog extends StatefulWidget {
+class AddAssetOwnershipPopup extends StatefulWidget {
   final List<String> vehicleList;
-  final List<String> supervisorList;
-  final List<String> locationList;
-  final AssetDTO asset;
+  final List<String> ownerList;
   final Function(String, String, String, DateTime, DateTime?) onAdd;
 
-  const AssetEditDialog({
+  const AddAssetOwnershipPopup({
     Key? key,
     required this.vehicleList,
-    required this.supervisorList,
-    required this.locationList,
-    required this.asset,
+    required this.ownerList,
     required this.onAdd,
   }) : super(key: key);
 
   @override
-  _AssetEditDialog createState() => _AssetEditDialog();
+  _AddAssetOwnershipPopup createState() => _AddAssetOwnershipPopup();
 }
 
-class _AssetEditDialog extends State<AssetEditDialog> {
+class _AddAssetOwnershipPopup extends State<AddAssetOwnershipPopup> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  FormattingUtility formattingUtility = FormattingUtility();
 
   String? selectedAssetType;
   String? selectedAssetName;
-  String? selectedLocation;
+  String? selectedCurrentOwner;
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
 
   @override
-  void initState() {
-    super.initState();
-    _setInitialData();
-  }
-
-  void _setInitialData(){
-    selectedAssetType = widget.asset.assetType;
-    selectedAssetName = widget.asset.assetName;
-    selectedLocation = widget.asset.location;
-    selectedStartDate = formattingUtility.getDateInDateTimeFormat(widget.asset.startDate);
-    if(widget.asset.endDate!.isNotEmpty){
-      selectedEndDate = formattingUtility.getDateInDateTimeFormat(widget.asset.endDate!) ;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Edit Asset Location'),
+      title: const Text('Add Asset Location'),
       content: Form(
         key: _formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -77,10 +54,6 @@ class _AssetEditDialog extends State<AssetEditDialog> {
                 DropdownMenuItem<String>(
                   value: 'VEHICLE',
                   child: Text('Vehicle'),
-                ),
-                DropdownMenuItem<String>(
-                  value: 'EMPLOYEE',
-                  child: Text('Employee'),
                 ),
               ],
               decoration: const InputDecoration(
@@ -110,52 +83,28 @@ class _AssetEditDialog extends State<AssetEditDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Asset Name',
                 ),
-              )
-            else if (selectedAssetType == 'EMPLOYEE')
-              DropdownButtonFormField<String>(
-                value: selectedAssetName,
-                onChanged: (value) {
-                  setState(() {
-                    selectedAssetName = value;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select an asset name';
-                  }
-                  return null;
-                },
-                items: widget.supervisorList.map((employee) {
-                  return DropdownMenuItem<String>(
-                    value: employee,
-                    child: Text(employee),
-                  );
-                }).toList(),
-                decoration: const InputDecoration(
-                  labelText: 'Asset Name',
-                ),
               ),
             DropdownButtonFormField<String>(
-              value: selectedLocation,
+              value: selectedCurrentOwner,
               onChanged: (value) {
                 setState(() {
-                  selectedLocation = value;
+                  selectedCurrentOwner = value;
                 });
               },
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please select a location';
+                  return 'Please select an owner for asset';
                 }
                 return null;
               },
-              items: widget.locationList.map((location) {
+              items: widget.ownerList.map((location) {
                 return DropdownMenuItem<String>(
                   value: location,
                   child: Text(location),
                 );
               }).toList(),
               decoration: const InputDecoration(
-                labelText: 'Location',
+                labelText: 'Current Owner',
               ),
             ),
             const SizedBox(height: 16),
@@ -207,7 +156,6 @@ class _AssetEditDialog extends State<AssetEditDialog> {
                   });
                 }
               },
-              // initialValue: widget.asset.endDate,
               decoration: const InputDecoration(
                 labelText: 'End Date',
                 suffixIcon: Icon(Icons.calendar_today),
@@ -224,29 +172,28 @@ class _AssetEditDialog extends State<AssetEditDialog> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Cancel'),
-                  ),
-                  const SizedBox(width: 16),
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         widget.onAdd(
                           selectedAssetType!,
                           selectedAssetName!,
-                          selectedLocation!,
+                          selectedCurrentOwner!,
                           selectedStartDate!,
                           selectedEndDate,
                         );
 
-                        // Dismiss the popup
                         Navigator.of(context).pop();
                       }
                     },
-                    child: const Text('Update'),
+                    child: const Text('Add'),
+                  ),
+                  const SizedBox(width: 16),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Cancel'),
                   ),
                 ],
               ),
