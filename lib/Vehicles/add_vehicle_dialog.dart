@@ -73,8 +73,8 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
           chassisNumber: _chassisNumber,
           engineNumber: _engineNumber,
           vehicleClass: _vehicleClass,
-          insuranceProvider: _insuranceProvider,
-          financeProvider: _financeProvider,
+          insuranceProvider: _isInsuranceProviderNotApplicable ? null : _insuranceProvider,
+          financeProvider: _isFinanceProviderNotApplicable ? null : _financeProvider,
           vehicleTaxes: _vehicleTaxes);
 
       if (result) {
@@ -311,7 +311,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
           },
           child: const Text('Cancel'),
         ),
-        TextButton(
+        ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               _formKey.currentState!.save();

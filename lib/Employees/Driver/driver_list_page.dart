@@ -106,10 +106,6 @@ class _DriverListPage extends State<DriverListPage> {
                                   value: 'view_edit',
                                   child: Text('View & Edit'),
                                 ),
-                                const PopupMenuItem(
-                                  value: 'current_location',
-                                  child: Text('Current Location'),
-                                ),
                               ];
                             },
                             onSelected: (value) {
@@ -123,8 +119,6 @@ class _DriverListPage extends State<DriverListPage> {
                                     ),
                                   );
                                 });
-                              } else if (value == 'current_location') {
-                                // Perform action for Current Location
                               } else if(value == 'call'){
                                 String phoneNumber = driver.mobileNumber.toString() ?? '';
                                 _makePhoneCall(phoneNumber);

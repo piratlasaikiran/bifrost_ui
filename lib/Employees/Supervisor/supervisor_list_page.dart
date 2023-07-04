@@ -105,10 +105,6 @@ class _SupervisorListPage extends State<SupervisorListPage> {
                                 value: 'view_edit',
                                 child: Text('View & Edit'),
                               ),
-                              const PopupMenuItem(
-                                value: 'current_location',
-                                child: Text('Current Location'),
-                              ),
                             ];
                           },
                           onSelected: (value) {
@@ -122,8 +118,6 @@ class _SupervisorListPage extends State<SupervisorListPage> {
                                   ),
                                 );
                               });
-                            } else if (value == 'current_location') {
-                            // Perform action for Current Location
                             } else if(value == 'call'){
                               String phoneNumber = supervisor.mobileNumber.toString() ?? '';
                               _makePhoneCall(phoneNumber);

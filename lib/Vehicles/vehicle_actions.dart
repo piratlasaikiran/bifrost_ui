@@ -9,7 +9,7 @@ import '../utils/user_manager.dart';
 import 'add_vehicle_dialog.dart';
 
 class VehicleDTO {
-  final String? vehicleNumber;
+  final String vehicleNumber;
   final String? owner;
   final String? chassisNumber;
   final String? engineNumber;
@@ -126,7 +126,7 @@ class VehicleActions{
     List<dynamic> vehicleDTOs = jsonDecode(response.body);
     final List<VehicleDTO> vehicles = vehicleDTOs.map((data) {
       return VehicleDTO(
-          vehicleNumber: data['vehicle_num'] as String?,
+          vehicleNumber: data['vehicle_num'] as String,
           owner: data['owner'] as String?,
           chassisNumber: data['chassis_num'] as String?,
           engineNumber: data['engine_num'] as String?,
@@ -185,6 +185,45 @@ class VehicleActions{
     request.files.add(imageField);
 
     var response = await request.send();
+    if(response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> updateVehicle({
+    required String currentVehicleNumber,
+    required String vehicleNumber,
+    required String owner,
+    required String chassisNumber,
+    required String engineNumber,
+    required String vehicleClass,
+    required String? insuranceProvider,
+    required String? financeProvider,
+  }) async{
+    UserManager userManager = UserManager();
+    String encodedVehicleNumber = Uri.encodeComponent(currentVehicleNumber);
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/$encodedVehicleNumber/update-vehicle');
+    var formData = {
+      'vehicle_num': vehicleNumber,
+      'owner': owner,
+      'chassis_num': chassisNumber,
+      'engine_num': engineNumber,
+      'vehicle_class': vehicleClass,
+      'insurance_provider': insuranceProvider,
+      'finance_provider': financeProvider
+    };
+    final headers = {
+      'Content-Type': 'application/json',
+      'X-User-Id': userManager.username,
+    };
+    final response = await http.put(
+      url,
+      headers: headers,
+      body: jsonEncode(formData),
+    );
+
     if(response.statusCode == 200) {
       return true;
     } else {
