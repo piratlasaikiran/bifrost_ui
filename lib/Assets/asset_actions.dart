@@ -56,8 +56,8 @@ class AssetActions{
         assetName: data['asset_name'] as String,
         assetType: data['asset_type'] as String,
         location: data['location'] as String,
-        startDate: formattingUtility.getDateFromLocalDate(data['start_date']),
-        endDate: data['end_date'] != null ? formattingUtility.getDateFromLocalDate(data['end_date']) : '',
+        startDate: formattingUtility.getDateStringFromLocalDate(data['start_date']),
+        endDate: data['end_date'] != null ? formattingUtility.getDateStringFromLocalDate(data['end_date']) : '',
       );
     }).toList();
     return assetLocations;
@@ -75,8 +75,8 @@ class AssetActions{
         assetName: data['asset_name'] as String,
         assetType: data['asset_type'] as String,
         currentOwner: data['cur_owner'] as String,
-        startDate: formattingUtility.getDateFromLocalDate(data['start_date']),
-        endDate: data['end_date'] != null ? formattingUtility.getDateFromLocalDate(data['end_date']) : '',
+        startDate: formattingUtility.getDateStringFromLocalDate(data['start_date']),
+        endDate: data['end_date'] != null ? formattingUtility.getDateStringFromLocalDate(data['end_date']) : '',
       );
     }).toList();
     return assetOwnerships;

@@ -5,25 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 
-
-class VehicleTaxDTO {
-  final String vehicleNumber;
-  final int amount;
-  final File? receipt;
-  final DateTime validityStartDate;
-  final DateTime validityEndDate;
-  final String? taxType;
-
-  VehicleTaxDTO({
-    required this.vehicleNumber,
-    required this.amount,
-    required this.receipt,
-    required this.validityStartDate,
-    required this.validityEndDate,
-    required this.taxType
-  });
-}
-
 class AddVehicleDialog extends StatefulWidget {
   const AddVehicleDialog({Key? key}) : super(key: key);
 

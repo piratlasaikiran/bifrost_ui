@@ -105,7 +105,7 @@ class EmployeeAttendanceActions {
         employeeType: data['employee_type'] as String,
         site: data['site'] as String,
         enteredBy: data['entered_by'] as String,
-        attendanceDate: formattingUtility.getDateFromLocalDate(data['attendance_date']),
+        attendanceDate: formattingUtility.getDateStringFromLocalDate(data['attendance_date']),
         attendanceType: data['attendance_type'] as String,
         makeTransaction: data['make_transaction'] as bool,
         bankAccount: data['bank_account'] as String?,

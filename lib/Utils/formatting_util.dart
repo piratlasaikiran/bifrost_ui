@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 
 class FormattingUtility{
-  String getDateFromLocalDate(Map<String, dynamic> localDateFormatMap){
+  String getDateStringFromLocalDate(Map<String, dynamic> localDateFormatMap){
     int year = localDateFormatMap['year'];
     int month = localDateFormatMap['monthValue'];
     int dayOfMonth = localDateFormatMap['dayOfMonth'];
@@ -9,7 +9,14 @@ class FormattingUtility{
     return DateFormat('dd-MM-yyyy').format(date);
   }
 
-  String getDateFromDateTime(DateTime dateTime){
+  DateTime getDateFromLocalDate(Map<String, dynamic> localDateFormatMap){
+    int year = localDateFormatMap['year'];
+    int month = localDateFormatMap['monthValue'];
+    int dayOfMonth = localDateFormatMap['dayOfMonth'];
+    return DateTime(year, month, dayOfMonth);
+  }
+
+  String getDateStringFromDateTime(DateTime dateTime){
     return DateFormat('dd-MM-yyyy').format(dateTime);
   }
 

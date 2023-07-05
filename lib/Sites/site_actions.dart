@@ -80,8 +80,8 @@ class SiteActions{
           siteStatus: data['site_status'] as String?,
           supervisors: (data['supervisors'] as List<dynamic>?)?.map((supervisor) => supervisor as String).toList(),
           vehicles: (data['vehicles'] as List<dynamic>?)?.map((vehicle) => vehicle as String).toList(),
-          startDate: formattingUtility.getDateFromLocalDate(data['work_start_date']),
-        endDate: formattingUtility.getDateFromLocalDate(data['work_end_date']),
+          startDate: formattingUtility.getDateStringFromLocalDate(data['work_start_date']),
+        endDate: formattingUtility.getDateStringFromLocalDate(data['work_end_date']),
       );
     }).toList();
     return sites;

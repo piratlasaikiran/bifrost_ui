@@ -1,7 +1,8 @@
 import 'package:bifrost_ui/Vehicles/upload_vehicle_tax_dialog.dart';
 import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
-import 'package:bifrost_ui/Vehicles/vehicle_list_page.dart';
+import 'package:bifrost_ui/Vehicles/vehicle_taxes_latest_list_page.dart';
 import 'package:flutter/material.dart';
+
 
 
 class VehicleTaxOptionsPage extends StatelessWidget {
@@ -35,8 +36,17 @@ class VehicleTaxOptionsPage extends StatelessWidget {
             _buildCircularButton(
               icon: Icons.file_copy_outlined,
               label: 'View \n Vehicle Taxes',
-              onTap: () {
-                // implement this
+              onTap: () async {
+                VehicleActions vehicleActions = VehicleActions();
+                Map<String, List<VehicleTaxDTO>> vehicleTaxesLatest = await vehicleActions.getLatestTaxTypesForAllVehicles();
+                Future.microtask(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LatestVehicleTaxesListPage(vehicleTaxesLatest: vehicleTaxesLatest),
+                    ),
+                  );
+                });
               },
             ),
           ],

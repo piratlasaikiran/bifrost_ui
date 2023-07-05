@@ -5,6 +5,7 @@ import 'package:bifrost_ui/Vehicles/vehicle_tax.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
+import '../Utils/formatting_util.dart';
 import '../utils/user_manager.dart';
 import 'add_vehicle_dialog.dart';
 
@@ -29,7 +30,28 @@ class VehicleDTO {
   });
 }
 
+class VehicleTaxDTO {
+  final String vehicleNumber;
+  final int amount;
+  final File? receipt;
+  final DateTime validityStartDate;
+  final DateTime validityEndDate;
+  final String? taxType;
+
+  VehicleTaxDTO({
+    required this.vehicleNumber,
+    required this.amount,
+    required this.receipt,
+    required this.validityStartDate,
+    required this.validityEndDate,
+    required this.taxType
+  });
+}
+
 class VehicleActions{
+
+  FormattingUtility formattingUtility = FormattingUtility();
+
   Future<bool> saveVehicle({
   required String vehicleNumber,
   required String owner,
@@ -230,5 +252,37 @@ class VehicleActions{
     } else {
       return false;
     }
+  }
+
+  Future<Map<String, List<VehicleTaxDTO>>> getLatestTaxTypesForAllVehicles() async{
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/get-latest-vehicle-taxes');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    Map<String, dynamic> vehicleTaxes = jsonDecode(response.body);
+    return convertIntoVehicleTaxesLatestMap(vehicleTaxes);
+  }
+
+  Map<String, List<VehicleTaxDTO>> convertIntoVehicleTaxesLatestMap(Map<String, dynamic> vehicleTaxes) {
+    Map<String, List<VehicleTaxDTO>> vehicleTaxesLatestMap = {};
+
+    vehicleTaxes.forEach((key, value) {
+      if (value is List) {
+        List<VehicleTaxDTO> taxList = [];
+        for (var vehicleTaxDTO in value) {
+          VehicleTaxDTO tax = VehicleTaxDTO(
+            vehicleNumber: vehicleTaxDTO['vehicle_num'],
+            amount: vehicleTaxDTO['renewal_amount'],
+            validityStartDate: formattingUtility.getDateFromLocalDate(vehicleTaxDTO['validity_start']),
+            validityEndDate: formattingUtility.getDateFromLocalDate(vehicleTaxDTO['validity_end']),
+            taxType: vehicleTaxDTO['tax_type'],
+            receipt: null,
+          );
+          taxList.add(tax);
+        }
+        vehicleTaxesLatestMap[key] = taxList;
+      }
+    });
+    return vehicleTaxesLatestMap;
   }
 }
