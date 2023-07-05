@@ -38,7 +38,7 @@ class VehicleActions{
   required String vehicleClass,
   required String? insuranceProvider,
   required String? financeProvider,
-  required List<VehicleTax> vehicleTaxes,
+  required List<VehicleTaxDTO> vehicleTaxes,
   }) async{
 
     UserManager userManager = UserManager();
@@ -79,7 +79,7 @@ class VehicleActions{
     }
   }
 
-  Future<List<VehicleTaxRequest>> imageSegregateHelper(List<VehicleTax> vehicleTaxes, http.MultipartRequest request) async {
+  Future<List<VehicleTaxRequest>> imageSegregateHelper(List<VehicleTaxDTO> vehicleTaxes, http.MultipartRequest request) async {
     List<VehicleTaxRequest> vehicleTaxDetails = [];
     for (var vehicleTax in vehicleTaxes) {
       VehicleTaxRequest vehicleTaxRequest = VehicleTaxRequest();
@@ -167,6 +167,7 @@ class VehicleActions{
     UserManager userManager = UserManager();
     var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/$vehicleNumber/upload-new-vehicle-tax');
     var formData = {
+      'vehicle_num': vehicleNumber,
       'tax_type': taxType,
       'renewal_amount': amount,
       'validity_start': '${validityStartDate?.year}-${validityStartDate?.month.toString().padLeft(2, '0')}-${validityStartDate?.day.toString().padLeft(2, '0')}',

@@ -1,9 +1,7 @@
-import 'dart:io';
 
 import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:image_picker/image_picker.dart';
 
 class VehicleEditDialog extends StatefulWidget {
   final VehicleDTO vehicle;

@@ -1,6 +1,7 @@
 import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
 import 'package:flutter/material.dart';
 
+import 'add_vehicle_dialog.dart';
 import 'edit_vehicle_dialog.dart';
 
 class VehicleListPage extends StatefulWidget {
@@ -106,7 +107,15 @@ class _VehicleListPage extends State<VehicleListPage> {
                               if (value == 'show_tax_receipts') {
                                 // Perform action for show_tax_receipts
                               } else if(value == 'upload_tax_receipt'){
-                                // Implement this upload_tax_receipt
+                                Future.microtask(() {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddVehicleTaxDialog(vehicleNumber: vehicle.vehicleNumber),
+                                    ),
+                                  );
+                                });
                               } else if(value == 'view_edit'){
                                 Future.microtask(() {
                                   Navigator.push(
