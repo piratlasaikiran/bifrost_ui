@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../Utils/formatting_util.dart';
+import 'edit_vendor_attendance_input_dialog.dart';
 
 class VendorAttendanceListPage extends StatefulWidget {
   final List<VendorAttendanceDTO> vendorAttendances;
@@ -72,6 +73,32 @@ class _VendorAttendanceListPageState extends State<VendorAttendanceListPage> {
     });
     vendorIdController.clear();
     siteController.clear();
+  }
+
+  void _showVendorAttendance(VendorAttendanceDTO vendorAttendanceDTO){
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Vendor Attendance'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: vendorAttendanceDTO.commodityAttendance.entries.map((entry) {
+                return Text('${entry.key}: ${entry.value}');
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -237,6 +264,35 @@ class _VendorAttendanceListPageState extends State<VendorAttendanceListPage> {
                             ],
                           ),
                         ],
+                      ),
+                      trailing: PopupMenuButton<String>(
+                          itemBuilder: (context) {
+                            return [
+                              const PopupMenuItem(
+                                value: 'view_attendance',
+                                child: Text('View Attendance'),
+                              ),
+                              const PopupMenuItem(
+                                value: 'view_edit',
+                                child: Text('View & Edit'),
+                              ),
+                            ];
+                          },
+                          onSelected: (value) {
+                            if (value == 'view_attendance') {
+                              _showVendorAttendance(vendorAttendance);
+                            } else if (value == 'view_edit') {
+                              Future.microtask(() {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditVendorAttendanceInputDialog(vendorAttendanceDTO: vendorAttendance),
+                                  ),
+                                );
+                              });
+                            }
+                          }
                       ),
                     ),
                     const Divider(color: Colors.grey),

@@ -24,6 +24,7 @@ class VendorDTO{
 }
 
 class VendorAttendanceDTO{
+  final int vendorAttendanceId;
   final String site;
   final String vendorId;
   final String enteredBy;
@@ -33,6 +34,7 @@ class VendorAttendanceDTO{
   final String? bankAccount;
 
   VendorAttendanceDTO({
+    required this.vendorAttendanceId,
     required this.site,
     required this.vendorId,
     required this.enteredBy,
@@ -195,6 +197,7 @@ class VendorActions{
     List<dynamic> vendorAttendanceDTOs = jsonDecode(response.body);
     final List<VendorAttendanceDTO> vendorAttendances = vendorAttendanceDTOs.map((data) {
       return VendorAttendanceDTO(
+        vendorAttendanceId: data['vendor_attendance_id'] as int,
         vendorId: data['vendor_id'] as String,
         site: data['site'] as String,
         enteredBy: data['entered_by'] as String,
@@ -261,6 +264,46 @@ class VendorActions{
 
     var response = await request.send();
     if(response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> updateVendorAttendance({
+    required int existingVendorAttendanceId,
+    required String vendorId,
+    required String site,
+    required Map<String, double> commodityAttendance,
+    required DateTime attendanceDate,
+    required bool makeTransaction,
+    required String? bankAccount,
+  }) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse(
+        'http://10.0.2.2:6852/bifrost/vendor-attendance/$existingVendorAttendanceId/update-vendor-attendance');
+    var attendanceBody = {
+      'site': site,
+      'vendor_id': vendorId,
+      'entered_by': userManager.username,
+      'attendance_date': '${attendanceDate.year}-${attendanceDate.month
+          .toString().padLeft(2, '0')}-${attendanceDate.day.toString().padLeft(
+          2, '0')}',
+      'commodity_attendance': commodityAttendance,
+      'make_transaction': makeTransaction,
+      'bank_account': bankAccount
+    };
+    final headers = {
+      'Content-Type': 'application/json',
+      'X-User-Id': userManager.username,
+    };
+    final response = await http.put(
+      url,
+      headers: headers,
+      body: jsonEncode(attendanceBody),
+    );
+
+    if (response.statusCode == 200) {
       return true;
     } else {
       return false;
