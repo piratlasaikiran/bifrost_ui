@@ -360,4 +360,10 @@ class VehicleActions{
     }
     return null;
   }
+
+  void deleteTemporaryLocation(File vehicleTaxLocation) {
+    if (vehicleTaxLocation.existsSync()) {
+      vehicleTaxLocation.deleteSync();
+    }
+  }
 }

@@ -7,6 +7,7 @@ import '../../Utils/user_manager.dart';
 import 'package:http/http.dart' as http;
 
 class EmployeeAttendanceDTO{
+  final int id;
   final String site;
   final String employeeName;
   final String employeeType;
@@ -17,6 +18,7 @@ class EmployeeAttendanceDTO{
   final String? bankAccount;
 
   EmployeeAttendanceDTO({
+    required this.id,
     required this.site,
     required this.employeeName,
     required this.employeeType,
@@ -101,6 +103,7 @@ class EmployeeAttendanceActions {
     List<dynamic> vendorAttendanceDTOs = jsonDecode(response.body);
     final List<EmployeeAttendanceDTO> employeeAttendances = vendorAttendanceDTOs.map((data) {
       return EmployeeAttendanceDTO(
+        id: data['employee_attendance_id'] as int,
         employeeName: data['employee_name'] as String,
         employeeType: data['employee_type'] as String,
         site: data['site'] as String,
@@ -112,5 +115,47 @@ class EmployeeAttendanceActions {
       );
     }).toList();
     return employeeAttendances;
+  }
+
+  Future<bool> updateAttendance({
+    required int existingAttendanceId,
+    required String employeeType,
+    required String employeeName,
+    required String site,
+    required String attendanceType,
+    required DateTime attendanceDate,
+    required bool makeTransaction,
+    required String? bankAccount,
+  }) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse(
+        'http://10.0.2.2:6852/bifrost/employee-attendance/$existingAttendanceId/update-attendance');
+    var attendanceBody = {
+      'site': site,
+      'employee_name': employeeName,
+      'employee_type': employeeType,
+      'entered_by': userManager.username,
+      'attendance_date': '${attendanceDate.year}-${attendanceDate.month
+          .toString().padLeft(2, '0')}-${attendanceDate.day.toString().padLeft(
+          2, '0')}',
+      'attendance_type': attendanceType,
+      'make_transaction': makeTransaction,
+      'bank_account': bankAccount
+    };
+    final headers = {
+      'Content-Type': 'application/json',
+      'X-User-Id': userManager.username,
+    };
+    final response = await http.put(
+      url,
+      headers: headers,
+      body: jsonEncode(attendanceBody),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

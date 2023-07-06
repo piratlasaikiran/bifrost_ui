@@ -114,6 +114,7 @@ class _VehicleTaxEditDialog extends State<VehicleTaxEditDialog> {
             },
           );
         });
+        vehicleActions.deleteTemporaryLocation(_receipt!);
       } else {
         Future.microtask(() {
           showDialog(

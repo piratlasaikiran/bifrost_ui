@@ -77,7 +77,7 @@ class _EditVendorAttendanceInputDialog
     _siteController.text = widget.vendorAttendanceDTO.site;
     makeTransaction = widget.vendorAttendanceDTO.makeTransaction;
     _selectedBankAccount = widget.vendorAttendanceDTO.bankAccount;
-    attendanceDate = formattingUtility.getDateInDateTimeFormat(widget.vendorAttendanceDTO!.attendanceDate);
+    attendanceDate = formattingUtility.getDateInDateTimeFormat(widget.vendorAttendanceDTO.attendanceDate);
   }
 
   Future<void> _selectAttendanceDate() async {
