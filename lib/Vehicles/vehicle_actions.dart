@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bifrost_ui/Vehicles/vehicle_tax.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:intl/intl.dart';
 
 import '../Utils/formatting_util.dart';
 import '../utils/user_manager.dart';
@@ -215,6 +216,46 @@ class VehicleActions{
     }
   }
 
+  Future<bool> updateVehicleTax({
+    required String existingVehicleNumber,
+    required String existingTaxType,
+    required String existingValidityStartDate,
+    required int? amount,
+    required String? vehicleNumber,
+    required String? taxType,
+    required DateTime? validityStartDate,
+    required DateTime? validityEndDate,
+    required File? receipt,
+  }) async{
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/$vehicleNumber/tax-type/$existingTaxType/validity-start-date/$existingValidityStartDate/update-vehicle-tax');
+    var formData = {
+      'vehicle_num': vehicleNumber,
+      'tax_type': taxType,
+      'renewal_amount': amount,
+      'validity_start': '${validityStartDate?.year}-${validityStartDate?.month.toString().padLeft(2, '0')}-${validityStartDate?.day.toString().padLeft(2, '0')}',
+      'validity_end': '${validityEndDate?.year}-${validityEndDate?.month.toString().padLeft(2, '0')}-${validityEndDate?.day.toString().padLeft(2, '0')}',
+    };
+    var jsonPart = http.MultipartFile.fromString(
+      'vehicleTax',
+      jsonEncode(formData),
+      contentType: MediaType('application', 'json'),
+    );
+    var request = http.MultipartRequest('PUT', url);
+    request.headers['X-User-Id'] = userManager.username;
+    var imageField = await http.MultipartFile.fromPath('taxReceipt', receipt!.path);
+
+    request.files.add(jsonPart);
+    request.files.add(imageField);
+
+    var response = await request.send();
+    if(response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future<bool> updateVehicle({
     required String currentVehicleNumber,
     required String vehicleNumber,
@@ -301,5 +342,22 @@ class VehicleActions{
       vehicleTaxes.add(getVehicleTaxDTO(element));
     }
     return vehicleTaxes;
+  }
+
+  Future<File?> getTaxDocument(String vehicleNumber, String? taxType, DateTime validityStartDate) async {
+    UserManager userManager = UserManager();
+    String formattedDate = DateFormat('yyyy-MM-dd').format(validityStartDate);
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/$vehicleNumber/tax-type/$taxType/validity-start-date/$formattedDate/get-vehicle-tax-document');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      List<int> fileBytes = response.bodyBytes;
+      final tempDir = Directory.systemTemp.createTempSync();
+      var tempPath = '${tempDir.path}/temp_file';
+      var file = File(tempPath);
+      await file.writeAsBytes(fileBytes);
+      return file;
+    }
+    return null;
   }
 }

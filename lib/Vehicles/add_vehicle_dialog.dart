@@ -315,7 +315,8 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
 
 class AddVehicleTaxDialog extends StatefulWidget {
   final String vehicleNumber;
-  const AddVehicleTaxDialog({Key? key, required this.vehicleNumber}) : super(key: key);
+  final String? taxType;
+  const AddVehicleTaxDialog({Key? key, required this.vehicleNumber, this.taxType}) : super(key: key);
 
 
   @override
@@ -327,6 +328,13 @@ class _AddVehicleTaxDialogState extends State<AddVehicleTaxDialog> {
   List<String> _taxTypes = [];
   VehicleActions vehicleActions = VehicleActions();
 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late int _amount;
+  late File? _receipt = null;
+  DateTime? _validityStartDate;
+  DateTime? _validityEndDate;
+  String? _selectedTaxType;
+
   @override
   void initState() {
     super.initState();
@@ -337,17 +345,9 @@ class _AddVehicleTaxDialogState extends State<AddVehicleTaxDialog> {
     final taxTypes = await vehicleActions.getVehicleTaxTypes();
     setState(() {
       _taxTypes = taxTypes;
+      _selectedTaxType = widget.taxType;
     });
   }
-
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late int _amount;
-  late File? _receipt = null;
-  DateTime? _validityStartDate;
-  DateTime? _validityEndDate;
-  String? _selectedTaxType;
-
-
 
   void _saveVehicleTax() {
     if (_formKey.currentState!.validate()) {

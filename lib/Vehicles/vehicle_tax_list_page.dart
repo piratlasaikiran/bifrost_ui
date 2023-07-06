@@ -2,6 +2,9 @@ import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'add_vehicle_dialog.dart';
+import 'edit_vehicle_tax_dialog.dart';
+
 class VehicleTaxListPage extends StatelessWidget {
   final List<VehicleTaxDTO> vehicleTaxes;
 
@@ -82,14 +85,31 @@ class VehicleTaxListPage extends StatelessWidget {
                           child: Text('View And Edit'),
                         ),
                         const PopupMenuItem(
-                          value: 'update_new',
+                          value: 'upload_new',
                           child: Text('Upload New'),
                         ),
                       ],
                       onSelected: (value) {
                         if (value == 'view_edit') {
-
-                        }else if (value == 'update_new') {
+                          Future.microtask(() {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    VehicleTaxEditDialog(vehicleTaxDTO: vehicleTax),
+                              ),
+                            );
+                          });
+                        }else if (value == 'upload_new') {
+                          Future.microtask(() {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    AddVehicleTaxDialog(vehicleNumber: vehicleTax.vehicleNumber, taxType: vehicleTax.taxType,),
+                              ),
+                            );
+                          });
                         }
                       },
                     ),
