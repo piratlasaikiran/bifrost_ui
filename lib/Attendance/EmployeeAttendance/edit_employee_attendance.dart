@@ -88,17 +88,15 @@ class _EditEmployeeAttendanceDialog
     });
   }
 
-  void _initializeDataForEdit(){
-    setState(() {
+  Future<void> _initializeDataForEdit() async {
       _selectedEmployeeType = widget.employeeAttendance.employeeType;
       _selectedEmployeeName = widget.employeeAttendance.employeeName;
-    });
-    // _selectedEmployeeName = widget.employeeAttendance.employeeName;
-    _selectedSite = widget.employeeAttendance.site;
-    makeTransaction = widget.employeeAttendance.makeTransaction;
-    _selectedBankAccount = widget.employeeAttendance.bankAccount;
-    _selectedAttendanceDate = formattingUtility.getDateInDateTimeFormat(widget.employeeAttendance.attendanceDate);
-    _selectedAttendanceType = widget.employeeAttendance.attendanceType;
+      _employeeNames = await _fetchEmployeeNames(_selectedEmployeeType!);
+      _selectedSite = widget.employeeAttendance.site;
+      makeTransaction = widget.employeeAttendance.makeTransaction;
+      _selectedBankAccount = widget.employeeAttendance.bankAccount;
+      _selectedAttendanceDate = formattingUtility.getDateInDateTimeFormat(widget.employeeAttendance.attendanceDate);
+      _selectedAttendanceType = widget.employeeAttendance.attendanceType;
   }
 
   Future<void> _selectAttendanceDate() async {
