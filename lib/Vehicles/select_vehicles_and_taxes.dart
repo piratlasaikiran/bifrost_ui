@@ -1,11 +1,9 @@
-import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
-import 'package:bifrost_ui/Vehicles/vehicle_list_page.dart';
+import 'package:bifrost_ui/Vehicles/vehicle_options_page.dart';
+import 'package:bifrost_ui/Vehicles/vehicle_tax_options_page.dart';
 import 'package:flutter/material.dart';
 
-import 'add_vehicle_dialog.dart';
-
-class VehicleOptionsPage extends StatelessWidget {
-  const VehicleOptionsPage({super.key});
+class VehiclesAndTaxesPage extends StatelessWidget {
+  const VehiclesAndTaxesPage({super.key});
 
 
   @override
@@ -13,39 +11,31 @@ class VehicleOptionsPage extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Vehicle Actions'),
+        title: const Text('Vehicle And Taxes'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildCircularButton(
-              icon: Icons.add,
-              label: 'Add Vehicle',
+              icon: Icons.train_outlined,
+              label: 'Vehicles',
               onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return const AddVehicleDialog();
-                  },
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const VehicleOptionsPage()),
                 );
               },
             ),
             const SizedBox(height: 16.0),
             _buildCircularButton(
-              icon: Icons.car_rental,
-              label: 'View Vehicles',
-              onTap: () async {
-                VehicleActions vehicleActions = VehicleActions();
-                List<VehicleDTO> vehicleDTOs = await vehicleActions.getAllVehicles();
-                Future.microtask(() {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => VehicleListPage(vehicles: vehicleDTOs),
-                    ),
-                  );
-                });
+              icon: Icons.file_copy_rounded,
+              label: 'Vehicle \n Tax Documents',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const VehicleTaxOptionsPage()),
+                );
               },
             ),
           ],

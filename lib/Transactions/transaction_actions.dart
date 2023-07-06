@@ -105,7 +105,7 @@ class TransactionActions{
       status: data['status'] as String,
       mode: data['mode'] as String,
       bankAccount: data['bank_account'] as String?,
-      transactionDate: formattingUtility.getDateFromLocalDate(data['transaction_date']),
+      transactionDate: formattingUtility.getDateStringFromLocalDate(data['transaction_date']),
     );
   }
 

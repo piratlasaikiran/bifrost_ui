@@ -1,11 +1,12 @@
+import 'package:bifrost_ui/Vehicles/upload_vehicle_tax_dialog.dart';
 import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
-import 'package:bifrost_ui/Vehicles/vehicle_list_page.dart';
+import 'package:bifrost_ui/Vehicles/vehicle_taxes_latest_list_page.dart';
 import 'package:flutter/material.dart';
 
-import 'add_vehicle_dialog.dart';
 
-class VehicleOptionsPage extends StatelessWidget {
-  const VehicleOptionsPage({super.key});
+
+class VehicleTaxOptionsPage extends StatelessWidget {
+  const VehicleTaxOptionsPage({super.key});
 
 
   @override
@@ -20,29 +21,29 @@ class VehicleOptionsPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildCircularButton(
-              icon: Icons.add,
-              label: 'Add Vehicle',
+              icon: Icons.upload_file,
+              label: 'Upload \n Tax Receipt',
               onTap: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return const AddVehicleDialog();
+                    return const UploadVehicleTaxDialog();
                   },
                 );
               },
             ),
             const SizedBox(height: 16.0),
             _buildCircularButton(
-              icon: Icons.car_rental,
-              label: 'View Vehicles',
+              icon: Icons.file_copy_outlined,
+              label: 'View \n Vehicle Taxes',
               onTap: () async {
                 VehicleActions vehicleActions = VehicleActions();
-                List<VehicleDTO> vehicleDTOs = await vehicleActions.getAllVehicles();
+                Map<String, List<VehicleTaxDTO>> vehicleTaxesLatest = await vehicleActions.getLatestTaxTypesForAllVehicles();
                 Future.microtask(() {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => VehicleListPage(vehicles: vehicleDTOs),
+                      builder: (context) => LatestVehicleTaxesListPage(vehicleTaxesLatest: vehicleTaxesLatest),
                     ),
                   );
                 });

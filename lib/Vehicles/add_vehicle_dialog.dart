@@ -5,23 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 
-
-class VehicleTax {
-  final int amount;
-  final File? receipt;
-  final DateTime validityStartDate;
-  final DateTime validityEndDate;
-  final String? taxType;
-
-  VehicleTax({
-    required this.amount,
-    required this.receipt,
-    required this.validityStartDate,
-    required this.validityEndDate,
-    required this.taxType
-  });
-}
-
 class AddVehicleDialog extends StatefulWidget {
   const AddVehicleDialog({Key? key}) : super(key: key);
 
@@ -33,14 +16,15 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late BuildContext dialogContext;
 
-  late String _vehicleNumber;
+  String _vehicleNumber = '';
   late String _owner;
   late String _chassisNumber;
   late String _engineNumber;
   late String _vehicleClass;
   String? _insuranceProvider;
   String? _financeProvider;
-  final List<VehicleTax> _vehicleTaxes = [];
+  final List<VehicleTaxDTO> _vehicleTaxes = [];
+  final _vehicleNumberController = TextEditingController();
 
   bool _isInsuranceProviderNotApplicable = false;
   bool _isFinanceProviderNotApplicable = false;
@@ -73,8 +57,8 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
           chassisNumber: _chassisNumber,
           engineNumber: _engineNumber,
           vehicleClass: _vehicleClass,
-          insuranceProvider: _insuranceProvider,
-          financeProvider: _financeProvider,
+          insuranceProvider: _isInsuranceProviderNotApplicable ? null : _insuranceProvider,
+          financeProvider: _isFinanceProviderNotApplicable ? null : _financeProvider,
           vehicleTaxes: _vehicleTaxes);
 
       if (result) {
@@ -123,11 +107,11 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
     }
   }
 
-  void _showAddVehicleTaxDialog() async {
-    final VehicleTax? newTax = await showDialog<VehicleTax>(
+  void _showAddVehicleTaxDialog(String vehicleNumber) async {
+    final VehicleTaxDTO? newTax = await showDialog<VehicleTaxDTO>(
       context: context,
       builder: (BuildContext context) {
-        return const AddVehicleTaxDialog();
+        return AddVehicleTaxDialog(vehicleNumber: vehicleNumber);
       },
     );
 
@@ -149,6 +133,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextFormField(
+                controller: _vehicleNumberController,
                 decoration: const InputDecoration(
                   labelText: 'Vehicle Number',
                 ),
@@ -277,7 +262,9 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
               Padding(
                 padding: const EdgeInsets.only(top: 24.0),
                 child: ElevatedButton(
-                  onPressed: _showAddVehicleTaxDialog,
+                  onPressed: (){
+                    _showAddVehicleTaxDialog(_vehicleNumberController.text);
+                  },
                   child: const Text('Add Vehicle Tax'),
                 ),
               ),
@@ -311,7 +298,7 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
           },
           child: const Text('Cancel'),
         ),
-        TextButton(
+        ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               _formKey.currentState!.save();
@@ -327,7 +314,9 @@ class _AddVehicleDialogState extends State<AddVehicleDialog> {
 }
 
 class AddVehicleTaxDialog extends StatefulWidget {
-  const AddVehicleTaxDialog({super.key});
+  final String vehicleNumber;
+  final String? taxType;
+  const AddVehicleTaxDialog({Key? key, required this.vehicleNumber, this.taxType}) : super(key: key);
 
 
   @override
@@ -339,6 +328,13 @@ class _AddVehicleTaxDialogState extends State<AddVehicleTaxDialog> {
   List<String> _taxTypes = [];
   VehicleActions vehicleActions = VehicleActions();
 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late int _amount;
+  late File? _receipt = null;
+  DateTime? _validityStartDate;
+  DateTime? _validityEndDate;
+  String? _selectedTaxType;
+
   @override
   void initState() {
     super.initState();
@@ -349,27 +345,16 @@ class _AddVehicleTaxDialogState extends State<AddVehicleTaxDialog> {
     final taxTypes = await vehicleActions.getVehicleTaxTypes();
     setState(() {
       _taxTypes = taxTypes;
+      _selectedTaxType = widget.taxType;
     });
   }
-
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late int _amount;
-  late File? _receipt = null;
-  DateTime? _validityStartDate;
-  DateTime? _validityEndDate;
-  String? _selectedTaxType;
-
-
 
   void _saveVehicleTax() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      // Perform save operation or any other desired action with the entered vehicle tax details
-      // Here, we're just printing the entered details to the console
-
-      // Create a new VehicleTax instance with the entered details
-      final VehicleTax newTax = VehicleTax(
+      final VehicleTaxDTO newTax = VehicleTaxDTO(
+          vehicleNumber: widget.vehicleNumber,
           amount: _amount,
           receipt: _receipt!,
           validityStartDate: _validityStartDate!,
@@ -377,7 +362,6 @@ class _AddVehicleTaxDialogState extends State<AddVehicleTaxDialog> {
           taxType: _selectedTaxType
       );
 
-      // Close the dialog and pass the new tax object back to the caller
       Navigator.of(context).pop(newTax);
     }
   }

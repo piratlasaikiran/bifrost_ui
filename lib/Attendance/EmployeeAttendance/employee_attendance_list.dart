@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../Utils/formatting_util.dart';
+import 'edit_employee_attendance.dart';
 import 'employee_attendance_actions.dart';
 
 class EmployeeAttendanceListPage extends StatefulWidget {
@@ -253,6 +254,29 @@ class _EmployeeAttendanceListPageState extends State<EmployeeAttendanceListPage>
                             ],
                           ),
                         ],
+                      ),
+                      trailing: PopupMenuButton<String>(
+                          itemBuilder: (context) {
+                            return [
+                              const PopupMenuItem(
+                                value: 'view_edit',
+                                child: Text('View & Edit'),
+                              ),
+                            ];
+                          },
+                          onSelected: (value) {
+                            if (value == 'view_edit') {
+                              Future.microtask(() {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditEmployeeAttendanceDialog(employeeAttendance: employeeAttendance),
+                                  ),
+                                );
+                              });
+                            }
+                          }
                       ),
                     ),
                     const Divider(color: Colors.grey),

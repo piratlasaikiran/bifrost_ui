@@ -1,6 +1,8 @@
 import 'package:bifrost_ui/Assets/asset_actions.dart';
-import 'package:bifrost_ui/Assets/asset_list_page.dart';
+import 'package:bifrost_ui/Assets/asset_location_list_page.dart';
 import 'package:flutter/material.dart';
+
+import 'asset_ownership_list_page.dart';
 
 
 class AssetOptionsPage extends StatelessWidget {
@@ -21,12 +23,12 @@ class AssetOptionsPage extends StatelessWidget {
               label: 'Manage Assets',
               onTap: () async {
                 AssetActions assetActions = AssetActions();
-                List<AssetDTO> assetDTOs = await assetActions.getAllAssetLocations();
+                List<AssetLocationDTO> assetLocationDTOs = await assetActions.getAllAssetLocations();
                 Future.microtask(() {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AssetListPage(assets: assetDTOs),
+                      builder: (context) => AssetLocationListPage(assetLocations: assetLocationDTOs),
                     ),
                   );
                 });
@@ -38,8 +40,17 @@ class AssetOptionsPage extends StatelessWidget {
             _buildCircularButton(
               icon: Icons.directions_bike,
               label: 'Vehicle Ownership',
-              onTap: () {
-                // Implement Vehicle Ownership flow
+              onTap: () async {
+                AssetActions assetActions = AssetActions();
+                List<AssetOwnershipDTO> assetOwnershipDTOs = await assetActions.getAllAssetOwnerships();
+                Future.microtask(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AssetOwnershipListPage(assetOwnerships: assetOwnershipDTOs),
+                    ),
+                  );
+                });
               },
               color: Colors.blue,
               borderColor: Colors.white,
