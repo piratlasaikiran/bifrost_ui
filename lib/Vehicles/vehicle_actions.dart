@@ -270,19 +270,36 @@ class VehicleActions{
       if (value is List) {
         List<VehicleTaxDTO> taxList = [];
         for (var vehicleTaxDTO in value) {
-          VehicleTaxDTO tax = VehicleTaxDTO(
-            vehicleNumber: vehicleTaxDTO['vehicle_num'],
-            amount: vehicleTaxDTO['renewal_amount'],
-            validityStartDate: formattingUtility.getDateFromLocalDate(vehicleTaxDTO['validity_start']),
-            validityEndDate: formattingUtility.getDateFromLocalDate(vehicleTaxDTO['validity_end']),
-            taxType: vehicleTaxDTO['tax_type'],
-            receipt: null,
-          );
+          VehicleTaxDTO tax = getVehicleTaxDTO(vehicleTaxDTO);
           taxList.add(tax);
         }
         vehicleTaxesLatestMap[key] = taxList;
       }
     });
     return vehicleTaxesLatestMap;
+  }
+
+  VehicleTaxDTO getVehicleTaxDTO(vehicleTaxDTO) {
+    return VehicleTaxDTO(
+          vehicleNumber: vehicleTaxDTO['vehicle_num'],
+          amount: vehicleTaxDTO['renewal_amount'],
+          validityStartDate: formattingUtility.getDateFromLocalDate(vehicleTaxDTO['validity_start']),
+          validityEndDate: formattingUtility.getDateFromLocalDate(vehicleTaxDTO['validity_end']),
+          taxType: vehicleTaxDTO['tax_type'],
+          receipt: null,
+        );
+  }
+
+  Future<List<VehicleTaxDTO>> getVehicleTaxes(String vehicleNumber) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/$vehicleNumber/get-vehicle-taxes');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<dynamic> vehicleTaxDTOs = jsonDecode(response.body);
+    final List<VehicleTaxDTO> vehicleTaxes = [];
+    for (var element in vehicleTaxDTOs) {
+      vehicleTaxes.add(getVehicleTaxDTO(element));
+    }
+    return vehicleTaxes;
   }
 }

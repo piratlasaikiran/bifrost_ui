@@ -1,6 +1,9 @@
 import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
+import 'package:bifrost_ui/Vehicles/vehicle_tax_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import 'add_vehicle_dialog.dart';
 
 class LatestVehicleTaxesListPage extends StatefulWidget {
   final Map<String, List<VehicleTaxDTO>> vehicleTaxesLatest;
@@ -53,7 +56,7 @@ class _LatestVehicleTaxesListPageState extends State<LatestVehicleTaxesListPage>
               controller: _filterController,
               onChanged: _filterVehicleNumbers,
               decoration: const InputDecoration(
-                labelText: 'Filter by Vehicle Number',
+                labelText: 'Vehicle Number',
               ),
             ),
           ),
@@ -84,6 +87,7 @@ class _LatestVehicleTaxesListPageState extends State<LatestVehicleTaxesListPage>
           _buildTableCell('INSURANCE', fontWeight: FontWeight.bold, fontSize: 16.0),
           _buildTableCell('TAX', fontWeight: FontWeight.bold, fontSize: 16.0),
           _buildTableCell('OTHERS', fontWeight: FontWeight.bold, fontSize: 16.0),
+          const TableCell(child: SizedBox()),
         ],
       ),
     );
@@ -119,6 +123,44 @@ class _LatestVehicleTaxesListPageState extends State<LatestVehicleTaxesListPage>
           _buildTableCell(formattedDate, fontSize: 16.0),
         );
       }
+      cells.add(
+        PopupMenuButton(
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'upload',
+              child: Text('Upload New Tax Doc'),
+            ),
+            const PopupMenuItem(
+              value: 'view',
+              child: Text('View Details'),
+            ),
+          ],
+          onSelected: (value) {
+            if (value == 'upload') {
+              Future.microtask(() {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        AddVehicleTaxDialog(vehicleNumber: vehicleNumber),
+                  ),
+                );
+              });
+            } else if (value == 'view') {
+              final List<VehicleTaxDTO> vehicleTaxes = widget.vehicleTaxesLatest[vehicleNumber] ?? [];
+              Future.microtask(() {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        VehicleTaxListPage(vehicleTaxes: vehicleTaxes),
+                  ),
+                );
+              });
+            }
+          },
+        ),
+      );
 
       rows.add(
         TableRow(
@@ -139,6 +181,7 @@ class _LatestVehicleTaxesListPageState extends State<LatestVehicleTaxesListPage>
   TableRow getEmptyRowForDivider() {
     return TableRow(
       children: [
+        _buildDividerCell(),
         _buildDividerCell(),
         _buildDividerCell(),
         _buildDividerCell(),

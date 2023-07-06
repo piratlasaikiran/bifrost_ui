@@ -1,4 +1,5 @@
 import 'package:bifrost_ui/Vehicles/vehicle_actions.dart';
+import 'package:bifrost_ui/Vehicles/vehicle_tax_list_page.dart';
 import 'package:flutter/material.dart';
 
 import 'add_vehicle_dialog.dart';
@@ -91,7 +92,7 @@ class _VehicleListPage extends State<VehicleListPage> {
                               return [
                                 const PopupMenuItem(
                                   value: 'show_tax_receipts',
-                                  child: Text('Show Tax Receipts'),
+                                  child: Text('Show All Tax Receipts'),
                                 ),
                                 const PopupMenuItem(
                                   value: 'view_edit',
@@ -103,9 +104,19 @@ class _VehicleListPage extends State<VehicleListPage> {
                                 )
                               ];
                             },
-                            onSelected: (value) {
+                            onSelected: (value) async {
                               if (value == 'show_tax_receipts') {
-                                // Perform action for show_tax_receipts
+                                VehicleActions vehicleActions = VehicleActions();
+                                List<VehicleTaxDTO> vehicleTaxDTOs = await vehicleActions.getVehicleTaxes(vehicle.vehicleNumber);
+                                Future.microtask(() {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          VehicleTaxListPage(vehicleTaxes: vehicleTaxDTOs),
+                                    ),
+                                  );
+                                });
                               } else if(value == 'upload_tax_receipt'){
                                 Future.microtask(() {
                                   Navigator.push(
