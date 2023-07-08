@@ -21,7 +21,8 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
   BankAccountActions bankAccountActions = BankAccountActions();
   late BuildContext dialogContext;
 
-  String? _name;
+  String? _firstName;
+  String? _lastName;
   String? _mobileNumber;
   String? _bankAccountNumber;
   double? _salary;
@@ -38,6 +39,7 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
     super.initState();
     _fetchAadhar();
     _fetchATMCards();
+    _initialiseName();
   }
 
   Future<void> _fetchAadhar() async {
@@ -52,7 +54,16 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
     setState(() {
       availableATMCards = atmCards;
       _atmCardNumber = availableATMCards.firstWhere((card) => card == widget.supervisor.atmCardNumber.toString(),  orElse: () => '');
+      if(_atmCardNumber == ''){
+        _atmCardNumber = null;
+      }
     });
+  }
+
+  void _initialiseName(){
+    List<String> nameParts = widget.supervisor.name.split(' ');
+    _firstName = nameParts.length > 1 ? nameParts.sublist(0, nameParts.length - 1).join(' ') : null;
+    _lastName = nameParts.isNotEmpty ? nameParts.last : null;
   }
 
   Future<void> _updateSupervisor() async {
@@ -78,8 +89,9 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
         return;
       }
 
+      String? fullName = '${_firstName ?? ''} ${_lastName ?? ''}';
       final result = await supervisorActions.updateSupervisor(existingSupervisor: widget.supervisor.name,
-          name: _name,
+          name: fullName,
           mobileNumber: _mobileNumber,
           bankAccountNumber: _bankAccountNumber,
           salary: _salary,
@@ -214,17 +226,34 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
             children: [
               TextFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Name',
+                  labelText: 'First Name',
                 ),
-                initialValue: widget.supervisor.name,
+                initialValue: _firstName,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a name';
+                    return 'Please enter first name';
                   }
                   return null;
                 },
                 onSaved: (value) {
-                  _name = value;
+                  _firstName = value;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Last Name',
+                ),
+                initialValue: _lastName,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter last name';
+                  } else if(value.contains(' ')){
+                    return 'Last Name can not contain space';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _lastName = value;
                 },
               ),
               TextFormField(
@@ -294,7 +323,7 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Company Mobile Number',
                 ),
-                initialValue: widget.supervisor.companyMobileNumber.toString(),
+                initialValue: widget.supervisor.companyMobileNumber != null ? widget.supervisor.companyMobileNumber.toString() : '',
                 validator: (value) {
                   if (value != null && value.isNotEmpty) {
                     if (value.length != 10 || int.tryParse(value) == null) {

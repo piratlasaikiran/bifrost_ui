@@ -8,6 +8,7 @@ import '../../Utils/user_manager.dart';
 import 'package:http/http.dart' as http;
 
 class VendorDTO{
+  final String name;
   final String vendorId;
   final String? location;
   final int? mobileNumber;
@@ -15,6 +16,7 @@ class VendorDTO{
   final Map<String, int> commodityCosts;
 
   VendorDTO({
+    required this.name,
     required this.vendorId,
     required this.location,
     required this.mobileNumber,
@@ -114,6 +116,7 @@ class VendorActions{
 
 
   Future<bool> saveVendor({
+    required String? name,
     required String? vendorId,
     required int? mobileNumber,
     required String? location,
@@ -124,6 +127,7 @@ class VendorActions{
     UserManager userManager = UserManager();
     var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/create-new-vendor');
     var formData = {
+      'name': name,
       'vendor_id': vendorId,
       'mobile_number': mobileNumber,
       'purposes': purposes,
@@ -158,6 +162,7 @@ class VendorActions{
     List<dynamic> vendorDTOs = jsonDecode(response.body);
     final List<VendorDTO> drivers = vendorDTOs.map((data) {
       return VendorDTO(
+          name: data['name'] as String,
           vendorId: data['vendor_id'] as String,
           location: data['location'] as String?,
           mobileNumber: data['mobile_number'] as int?,
@@ -234,6 +239,7 @@ class VendorActions{
 
   Future<bool> updateVendor({
     required String existingVendorId,
+    required String name,
     required String? vendorId,
     required int? mobileNumber,
     required String? location,
@@ -244,6 +250,7 @@ class VendorActions{
     UserManager userManager = UserManager();
     var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/$existingVendorId/update-vendor');
     var formData = {
+      'name': name,
       'vendor_id': vendorId,
       'mobile_number': mobileNumber,
       'purposes': purposes,

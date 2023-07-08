@@ -20,6 +20,8 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
   VendorActions vendorActions = VendorActions();
 
   String? _vendorId;
+  String? _firstName;
+  String? _lastName;
   int? _mobileNumber;
   String? _selectedLocation;
   List<String> _selectedPurposes = [];
@@ -84,7 +86,9 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
         return;
       }
 
+      String? fullName = '${_firstName ?? ''} ${_lastName ?? ''}';
       final result = await vendorActions.saveVendor(
+          name: fullName,
           vendorId: _vendorId,
           mobileNumber: _mobileNumber,
           location: _selectedLocation,
@@ -300,11 +304,6 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
     });
   }
 
-
-
-
-
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -315,6 +314,36 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'First Name',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter first name';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _firstName = value;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Last Name',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter last name';
+                  } else if(value.contains(' ')){
+                    return 'Last Name can not contain space';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _lastName = value;
+                },
+              ),
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Vendor ID'),
                 validator: (value) {

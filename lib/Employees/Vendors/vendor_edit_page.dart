@@ -21,6 +21,8 @@ class _VendorEditDialogState extends State<VendorEditDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   VendorActions vendorActions = VendorActions();
 
+  String? _firstName;
+  String? _lastName;
   String? _vendorId;
   int? _mobileNumber;
   String? _selectedLocation;
@@ -40,6 +42,7 @@ class _VendorEditDialogState extends State<VendorEditDialog> {
     _fetchPurposeList();
     _fetchCommodityBaseUnits();
     _fetchContractDoc();
+    _initialiseName();
   }
 
   void _fetchLocationList() async {
@@ -74,6 +77,12 @@ class _VendorEditDialogState extends State<VendorEditDialog> {
     });
   }
 
+  void _initialiseName(){
+    List<String> nameParts = widget.vendor.name.split(' ');
+    _firstName = nameParts.length > 1 ? nameParts.sublist(0, nameParts.length - 1).join(' ') : null;
+    _lastName = nameParts.isNotEmpty ? nameParts.last : null;
+  }
+
   Future<void> _updateVendor() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -97,8 +106,10 @@ class _VendorEditDialogState extends State<VendorEditDialog> {
         return;
       }
 
+      String? fullName = '${_firstName ?? ''} ${_lastName ?? ''}';
       final result = await vendorActions.updateVendor(
           existingVendorId: widget.vendor.vendorId,
+          name: fullName,
           vendorId: _vendorId,
           mobileNumber: _mobileNumber,
           location: _selectedLocation,
@@ -310,7 +321,6 @@ class _VendorEditDialogState extends State<VendorEditDialog> {
         });
       },
     ).then((_) {
-      // Call setState to force the update of the selected commodity map on the screen
       setState(() {});
     });
   }
@@ -330,6 +340,38 @@ class _VendorEditDialogState extends State<VendorEditDialog> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'First Name',
+                ),
+                initialValue: _firstName,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter first name';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _firstName = value;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Last Name',
+                ),
+                initialValue: _lastName,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter last name';
+                  } else if(value.contains(' ')){
+                    return 'Last Name can not contain space';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _lastName = value;
+                },
+              ),
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Vendor ID'),
                 initialValue: widget.vendor.vendorId,

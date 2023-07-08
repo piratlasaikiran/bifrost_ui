@@ -35,8 +35,8 @@ class _VendorListPage extends State<VendorListPage> {
 
       filteredVendors = widget.vendors.where((vendor) {
         final vendorId = vendor.vendorId.toLowerCase();
-
-        return vendorId.contains(filterVendorName);
+        final vendorName = vendor.name.toLowerCase();
+        return (vendorId.contains(filterVendorName) || vendorName.contains(filterVendorName));
       }).toList();
     });
   }
@@ -115,12 +115,13 @@ class _VendorListPage extends State<VendorListPage> {
                       children: [
                         ListTile(
                           title: Text(
-                            vendor.vendorId ?? '',
+                            vendor.name ?? '',
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Text('ID: ${vendor.vendorId ?? ''}'),
                               Text('Site: ${vendor.location ?? ''}'),
                               const SizedBox(height: 6.0),
                               Wrap(

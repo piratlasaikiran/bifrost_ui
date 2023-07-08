@@ -15,7 +15,8 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late BuildContext dialogContext;
 
-  String? _name;
+  String? _firstName;
+  String? _lastName;
   String? _mobileNumber;
   String? _bankAccountNumber;
   double? _salary;
@@ -66,9 +67,9 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
         );
         return;
       }
-
       DriverActions supervisorActions = DriverActions();
-      final result = await supervisorActions.saveDriver(name: _name,
+      String? fullName = '${_firstName ?? ''} ${_lastName ?? ''}';
+      final result = await supervisorActions.saveDriver(name: fullName,
           mobileNumber: _mobileNumber,
           bankAccountNumber: _bankAccountNumber,
           salary: _salary,
@@ -279,7 +280,23 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
                   return null;
                 },
                 onSaved: (value) {
-                  _name = value;
+                  _firstName = value;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Last Name',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter last name';
+                  } else if(value.contains(' ')){
+                    return 'Last Name can not contain space';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _lastName = value;
                 },
               ),
               TextFormField(
