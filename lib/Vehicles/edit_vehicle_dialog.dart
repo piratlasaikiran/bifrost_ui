@@ -126,7 +126,7 @@ class _VehicleEditDialog extends State<VehicleEditDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Add Vehicle'),
+      title: const Text('Edit Vehicle'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,

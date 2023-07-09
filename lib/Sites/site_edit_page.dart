@@ -79,7 +79,7 @@ class _EditSiteDialogState extends State<EditSiteDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Create Site'),
+      title: const Text('Edit Site'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,

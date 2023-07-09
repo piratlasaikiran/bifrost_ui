@@ -258,13 +258,23 @@ class _TransactionListPageState extends State<TransactionListPage> {
     return ListTile(
       title: Row(
         children: [
-          Text(transaction.source,
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+          Flexible(
+            child: Text(
+              transaction.source,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
           const SizedBox(width: 6),
           const Icon(Icons.arrow_forward),
           const SizedBox(width: 6),
-          Text(transaction.destination,
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+          Flexible(
+            child: Text(
+              transaction.destination,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
       subtitle: Column(

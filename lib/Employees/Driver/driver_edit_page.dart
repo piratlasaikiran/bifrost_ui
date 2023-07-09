@@ -297,7 +297,7 @@ class _DriverEditDialogState extends State<DriverEditDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Enter Driver Details'),
+      title: const Text('Edit Driver Details'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,

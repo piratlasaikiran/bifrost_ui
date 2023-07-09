@@ -333,7 +333,7 @@ class _VendorEditDialogState extends State<VendorEditDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Vendor Input'),
+      title: const Text('Edit Vendor'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,

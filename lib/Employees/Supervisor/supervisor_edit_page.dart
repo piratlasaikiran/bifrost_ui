@@ -218,7 +218,7 @@ class _SupervisorEditDialogState extends State<SupervisorEditDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Enter Supervisor Details'),
+      title: const Text('Edit Supervisor Details'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
