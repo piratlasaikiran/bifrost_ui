@@ -1,31 +1,37 @@
+import 'package:bifrost_ui/BankAccounts/passbook_actions.dart';
+import 'package:bifrost_ui/BankAccounts/pending_balances_list.dart';
 import 'package:bifrost_ui/Employees/manage_employees_page.dart';
 import 'package:flutter/material.dart';
 
-import '../BankAccounts/pending_balance_and_passbook.dart';
+import '../BankAccounts/passbook_main_page_list.dart';
 
-class EmployeeOptionsPage extends StatelessWidget {
-  const EmployeeOptionsPage({super.key});
+class BalancesPage extends StatelessWidget {
+  const BalancesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Employee Options'),
+        title: const Text('Employee Balances'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildCircularButton(
-              icon: Icons.supervisor_account,
-              label: 'Manage Employees',
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return const ManageEmployeesPage();
-                  },
-                );
+              icon: Icons.pending_actions_rounded,
+              label: 'Pending Balances',
+              onTap: () async {
+                PassBookActions passBookActions = PassBookActions();
+                List<PendingBalanceDTO> pendingBalanceDTOs = await passBookActions.getAllPendingBalancesForAllUsers();
+                Future.microtask(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PendingBalancesList(pendingBalances: pendingBalanceDTOs),
+                    ),
+                  );
+                });
               },
               color: Colors.blue,
               borderColor: Colors.white,
@@ -33,14 +39,18 @@ class EmployeeOptionsPage extends StatelessWidget {
             const SizedBox(height: 16.0),
             _buildCircularButton(
               icon: Icons.account_balance_wallet,
-              label: 'CashBooks',
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return const BalancesPage();
-                  },
-                );
+              label: 'PassBooks',
+              onTap: () async {
+                PassBookActions passBookActions = PassBookActions();
+                List<PassBookDTO> passBookDTOs = await passBookActions.getAllPassBookMainPages();
+                Future.microtask(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PassBookMainPageListPage(passBookMainPages: passBookDTOs),
+                    ),
+                  );
+                });
               },
               color: Colors.blue,
               borderColor: Colors.white,

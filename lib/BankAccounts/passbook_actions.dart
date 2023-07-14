@@ -23,6 +23,18 @@ class PassBookDTO{
   });
 }
 
+class PendingBalanceDTO{
+  final String accountName;
+  final TransactionDTO transactionDTO;
+  final int pendingBalance;
+
+  PendingBalanceDTO({
+    required this.accountName,
+    required this.transactionDTO,
+    required this.pendingBalance
+  });
+}
+
 class PassBookActions{
 
   TransactionActions transactionActions = TransactionActions();
@@ -63,5 +75,37 @@ class PassBookActions{
       );
     }).toList();
     return passBookEntries;
+  }
+
+  Future<List<PendingBalanceDTO>> getAllPendingBalancesForAllUsers() async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/pending-balances');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<dynamic> pendingBalanceDTOs = jsonDecode(response.body);
+    final List<PendingBalanceDTO> pendingBalances = pendingBalanceDTOs.map((data) {
+      return PendingBalanceDTO(
+          accountName: data['account_name'] as String,
+          transactionDTO: transactionActions.getTransactionDTO(data['transaction']),
+          pendingBalance: data['pending_balance'] as int
+      );
+    }).toList();
+    return pendingBalances;
+  }
+
+  Future<List<PendingBalanceDTO>> getPendingBalanceEntriesForAccount(String accountName) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/account-name/$accountName/account-pending-balances');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<dynamic> pendingBalanceDTOs = jsonDecode(response.body);
+    final List<PendingBalanceDTO> pendingBalances = pendingBalanceDTOs.map((data) {
+      return PendingBalanceDTO(
+          accountName: data['account_name'] as String,
+          transactionDTO: transactionActions.getTransactionDTO(data['transaction']),
+          pendingBalance: data['pending_balance'] as int
+      );
+    }).toList();
+    return pendingBalances;
   }
 }
