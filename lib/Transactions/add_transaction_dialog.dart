@@ -10,6 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../Sites/site_actions.dart';
+import '../Vehicles/vehicle_actions.dart';
+
 class AddTransactionDialog extends StatefulWidget {
   const AddTransactionDialog({super.key});
 
@@ -21,6 +24,12 @@ class AddTransactionDialog extends StatefulWidget {
 class _AddTransactionDialogState extends State<AddTransactionDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TransactionActions transactionActions = TransactionActions();
+  SiteActions siteActions = SiteActions();
+  BankAccountActions bankAccountActions = BankAccountActions();
+  VendorActions vendorActions = VendorActions();
+  DriverActions driverActions = DriverActions();
+  SupervisorActions supervisorActions = SupervisorActions();
+  VehicleActions vehicleActions = VehicleActions();
 
   String? _selectedSource;
   String? _selectedDestination;
@@ -31,15 +40,41 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   String? _selectedBankAccount;
   DateTime? _transactionDate;
   String? _remarks;
+  String? _selectedSite;
+  String? _selectedVehicle;
+  bool _associationWithSite = false;
+  bool _associationWithVehicle = false;
 
   final _tnxSourceController = TextEditingController();
   final _tnxDestinationController = TextEditingController();
+  final _tnxSiteController = TextEditingController();
+  final _tnxVehicleController = TextEditingController();
 
   List<String> _sources = [];
   List<String> _destinations = [];
   List<String> _purposes = [];
   List<String> _modes = [];
   List<String> _bankAccounts = [];
+  List<String> _sites = [];
+  List<String> _vehicles = [];
+
+  void _toggleSiteAssociation() {
+    setState(() {
+      _associationWithSite = !_associationWithSite;
+      if (_associationWithSite) {
+        _selectedSite = null;
+      }
+    });
+  }
+
+  void _toggleVehicleAssociation() {
+    setState(() {
+      _associationWithVehicle = !_associationWithVehicle;
+      if (_associationWithVehicle) {
+        _selectedVehicle = null;
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -49,6 +84,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     _fetchBankAccounts();
     _fetchSources();
     _fetchDestinations();
+    _fetchSites();
+    _fetchVehicles();
     _selectedBankAccount = 'My Account';
   }
 
@@ -67,7 +104,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   }
 
   void _fetchBankAccounts() async {
-    BankAccountActions bankAccountActions = BankAccountActions();
     final accountNames = await bankAccountActions.getAccountNickNames();
     setState(() {
       _bankAccounts = accountNames;
@@ -76,7 +112,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   }
 
   void _fetchSources() async {
-    SupervisorActions supervisorActions = SupervisorActions();
     final supervisors = await supervisorActions.getSupervisorNames();
     setState(() {
       _sources = supervisors;
@@ -84,19 +119,28 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   }
 
   void _fetchDestinations() async {
-    SupervisorActions supervisorActions = SupervisorActions();
     final supervisors = await supervisorActions.getSupervisorNames();
-
-    DriverActions driverActions = DriverActions();
     final drivers = await driverActions.getDriverNames();
-
-    VendorActions vendorActions = VendorActions();
     final vendors = await vendorActions.getVendorIds();
 
     setState(() {
       _destinations = supervisors;
       _destinations.addAll(drivers);
       _destinations.addAll(vendors);
+    });
+  }
+
+  void _fetchSites() async {
+    final sites = await siteActions.getSiteNames();
+    setState(() {
+      _sites = sites;
+    });
+  }
+
+  void _fetchVehicles() async {
+    final vehicles = await vehicleActions.getVehicleNumbers();
+    setState(() {
+      _vehicles = vehicles;
     });
   }
 
@@ -109,6 +153,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
           amount: _amount,
           bill: _bill,
           purpose: _selectedPurpose,
+          site: _selectedSite,
+          vehicleNumber: _selectedVehicle,
           mode: _selectedMode,
           bankAccount: _selectedBankAccount,
           transactionDate: _transactionDate,
@@ -503,6 +549,146 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                   );
                 }).toList(),
                 decoration: const InputDecoration(labelText: 'Bank Account'),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TypeAheadFormField<String>(
+                      key: const Key('Site'),
+                      textFieldConfiguration: TextFieldConfiguration(
+                        controller: _tnxSiteController,
+                        enabled: !_associationWithSite,
+                        decoration: const InputDecoration(
+                          hintText: 'Site',
+                          hintStyle: TextStyle(fontSize: 14),
+                          prefixIcon: Icon(Icons.search),
+                        ),
+                      ),
+                      suggestionsCallback: (String pattern) {
+                        if (pattern.isEmpty) {
+                          return _sites;
+                        } else {
+                          final filteredList = _sites
+                              .where((site) => site.toLowerCase().contains(pattern.toLowerCase()))
+                              .toList();
+                          return filteredList;
+                        }
+                      },
+                      itemBuilder: (BuildContext context, String suggestion) {
+                        return ListTile(
+                          title: Text(suggestion),
+                        );
+                      },
+                      onSuggestionSelected: (String suggestion) {
+                        setState(() {
+                          _selectedSite = suggestion;
+                          _tnxSiteController.text = suggestion;
+                        });
+                      },
+                      validator: (value) {
+                        if (!_associationWithSite && (value == null || value.isEmpty)) {
+                          return 'Please provide site name';
+                        }
+                        return null;
+                      },
+                      noItemsFoundBuilder: (BuildContext context) {
+                        return const SizedBox(
+                          height: 48.0,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
+                            child: Text(
+                              'No items found',
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      onSaved: (String? value) {
+                        _selectedSite = value;
+                      },
+                    ),
+                  ),
+                  Checkbox(
+                    value: _associationWithSite,
+                    onChanged: (value) {
+                      _toggleSiteAssociation();
+                    },
+                  ),
+                  const Text('NA'),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TypeAheadFormField<String>(
+                      key: const Key('Vehicle'),
+                      textFieldConfiguration: TextFieldConfiguration(
+                        controller: _tnxVehicleController,
+                        enabled: !_associationWithVehicle,
+                        decoration: const InputDecoration(
+                          hintText: 'Vehicle',
+                          hintStyle: TextStyle(fontSize: 14),
+                          prefixIcon: Icon(Icons.search),
+                        ),
+                      ),
+                      suggestionsCallback: (String pattern) {
+                        if (pattern.isEmpty) {
+                          return _vehicles;
+                        } else {
+                          final filteredList = _vehicles
+                              .where((vehicle) => vehicle.toLowerCase().contains(pattern.toLowerCase()))
+                              .toList();
+                          return filteredList;
+                        }
+                      },
+                      itemBuilder: (BuildContext context, String suggestion) {
+                        return ListTile(
+                          title: Text(suggestion),
+                        );
+                      },
+                      onSuggestionSelected: (String suggestion) {
+                        setState(() {
+                          _selectedVehicle = suggestion;
+                          _tnxVehicleController.text = suggestion;
+                        });
+                      },
+                      validator: (value) {
+                        if (!_associationWithVehicle && (value == null || value.isEmpty)) {
+                          return 'Please provide vehicle name';
+                        }
+                        return null;
+                      },
+                      noItemsFoundBuilder: (BuildContext context) {
+                        return const SizedBox(
+                          height: 48.0,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
+                            child: Text(
+                              'No items found',
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      onSaved: (String? value) {
+                        _selectedVehicle = value;
+                      },
+                    ),
+                  ),
+                  Checkbox(
+                    value: _associationWithVehicle,
+                    onChanged: (value) {
+                      _toggleVehicleAssociation();
+                    },
+                  ),
+                  const Text('NA'),
+                ],
               ),
               TextFormField(
                 decoration: const InputDecoration(

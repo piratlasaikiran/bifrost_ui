@@ -13,6 +13,8 @@ class TransactionDTO{
   final int amount;
   final String purpose;
   final String? remarks;
+  final String? site;
+  final String? vehicle;
   final String transactionDate;
   final String status;
   final String mode;
@@ -25,6 +27,8 @@ class TransactionDTO{
     required this.amount,
     required this.purpose,
     required this.remarks,
+    required this.site,
+    required this.vehicle,
     required this.transactionDate,
     required this.status,
     required this.mode,
@@ -44,6 +48,8 @@ class TransactionActions{
     required File? bill,
     required String? purpose,
     required String? mode,
+    required String? site,
+    required String? vehicleNumber,
     required String? bankAccount,
     required DateTime? transactionDate,
     required String? remarks
@@ -55,6 +61,8 @@ class TransactionActions{
       'destination': destination,
       'amount': amount,
       'purpose': purpose,
+      'site': site,
+      'vehicle_number': vehicleNumber,
       'remarks': remarks,
       'transaction_date': '${transactionDate!.year}-${transactionDate.month.toString().padLeft(2, '0')}-${transactionDate.day.toString().padLeft(2, '0')}',
       'mode': mode,
@@ -102,6 +110,8 @@ class TransactionActions{
       amount: data['amount'] as int,
       purpose: data['purpose'] as String,
       remarks: data['remarks'] as String?,
+      site: data['site'] as String?,
+      vehicle: data['vehicle_number'] as String?,
       status: data['status'] as String,
       mode: data['mode'] as String,
       bankAccount: data['bank_account'] as String?,
@@ -143,6 +153,8 @@ class TransactionActions{
     required int? amount,
     required File? bill,
     required String? purpose,
+    required String? site,
+    required String? vehicleNumber,
     required String? mode,
     required String? bankAccount,
     required DateTime? transactionDate,
@@ -155,6 +167,8 @@ class TransactionActions{
       'destination': destination,
       'amount': amount,
       'purpose': purpose,
+      'site': site,
+      'vehicle_number': vehicleNumber,
       'remarks': remarks,
       'transaction_date': '${transactionDate!.year}-${transactionDate.month.toString().padLeft(2, '0')}-${transactionDate.day.toString().padLeft(2, '0')}',
       'mode': mode,
