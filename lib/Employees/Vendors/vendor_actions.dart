@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 
 import '../../Utils/formatting_util.dart';
-import '../../Utils/user_manager.dart';
+import '../../utils/user_manager.dart';
 
 import 'package:http/http.dart' as http;
 

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http_parser/http_parser.dart';
 
 import '../Transactions/transaction_actions.dart';
-import '../Utils/user_manager.dart';
+import '../../utils/user_manager.dart';
 
 import 'package:http/http.dart' as http;
 

@@ -7,7 +7,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:intl/intl.dart';
 
 import '../Utils/formatting_util.dart';
-import '../utils/user_manager.dart';
+import '../../utils/user_manager.dart';
 import 'add_vehicle_dialog.dart';
 
 class VehicleDTO {

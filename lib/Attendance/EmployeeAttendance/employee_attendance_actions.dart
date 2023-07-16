@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:bifrost_ui/Utils/formatting_util.dart';
 
-import '../../Utils/user_manager.dart';
+import '../../utils/user_manager.dart';
 
 import 'package:http/http.dart' as http;
 
