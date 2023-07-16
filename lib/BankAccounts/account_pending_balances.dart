@@ -7,6 +7,7 @@ import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
 import '../Transactions/transaction_actions.dart';
 import '../Utils/formatting_util.dart';
+import 'bank_account_actions.dart';
 
 class AccountPendingBalance extends StatefulWidget {
   final String accountName;
@@ -20,27 +21,38 @@ class AccountPendingBalance extends StatefulWidget {
 class _AccountPendingBalance extends State<AccountPendingBalance> {
   List<PendingBalanceDTO> pendingBalanceEntries = [];
   List<PendingBalanceDTO> initialPendingBalanceEntries = [];
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   PassBookActions passBookActions = PassBookActions();
   TransactionActions transactionActions = TransactionActions();
   FormattingUtility formattingUtility = FormattingUtility();
+  BankAccountActions bankAccountActions = BankAccountActions();
 
   int filterAmount = 0;
   DateTime? filterTransactionStartDate;
   DateTime? filterTransactionEndDate;
   List<String> selectedPurposes = [];
+  String? selectedMode;
+  String? _selectedBankAccount;
+  String? _remarks;
 
   final TextEditingController amountController = TextEditingController();
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
 
   List<String> availablePurposes = [];
+  List<String> availableModes = [];
+  List<String> availableBankAccounts = [];
 
   @override
   void initState() {
     super.initState();
+    _selectedBankAccount = 'My Account';
+    selectedMode = 'CASH';
     _fetchPendingBalanceEntries();
     _fetchTransactionPurposes();
+    _fetchTransactionModes();
+    _fetchBankAccounts();
   }
 
   Future<void> _fetchPendingBalanceEntries() async {
@@ -56,6 +68,21 @@ class _AccountPendingBalance extends State<AccountPendingBalance> {
     final transactionPurposes = await transactionActions.getPurposes();
     setState(() {
       availablePurposes = transactionPurposes;
+    });
+  }
+
+  void _fetchTransactionModes() async {
+    final transactionModes = await transactionActions.getModes();
+    setState(() {
+      availableModes = transactionModes;
+    });
+  }
+
+  void _fetchBankAccounts() async {
+    final accountNames = await bankAccountActions.getAccountNickNames();
+    setState(() {
+      availableBankAccounts = accountNames;
+      availableBankAccounts.add("My Account");
     });
   }
 
@@ -243,11 +270,144 @@ class _AccountPendingBalance extends State<AccountPendingBalance> {
     });
   }
 
+  Future<void> _settleBalances() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      final result = await passBookActions.settlePendingBalanceForUser(
+          accountName: widget.accountName,
+          mode: selectedMode!,
+          remarks: _remarks,
+          bankAccount: _selectedBankAccount!);
+
+      if (result) {
+        Future.microtask(() {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Success'),
+                content: const Text('Balance Settled Successfully.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        });
+      } else {
+        Future.microtask(() {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Failure'),
+                content: const Text('Failed to settle balance.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        });
+      }
+    }
+  }
+
+  void settlePendingBalance(){
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Settle Balance'),
+          content: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DropdownButtonFormField<String>(
+                    value: selectedMode,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedMode = value!;
+                      });
+                    },
+                    items: availableModes.map((mode) {
+                      return DropdownMenuItem<String>(
+                        value: mode,
+                        child: Text(mode),
+                      );
+                    }).toList(),
+                    decoration: const InputDecoration(labelText: 'Mode *'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please select a Mode';
+                      }
+                      return null;
+                    },
+                  ),
+                  DropdownButtonFormField<String>(
+                    value: _selectedBankAccount,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedBankAccount = value!;
+                      });
+                    },
+                    items: availableBankAccounts.map((bankAccount) {
+                      return DropdownMenuItem<String>(
+                        value: bankAccount,
+                        child: Text(bankAccount),
+                      );
+                    }).toList(),
+                    decoration: const InputDecoration(labelText: 'Bank Account'),
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Remarks',
+                    ),
+                    onChanged: (value) {
+                      _remarks = value;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _settleBalances();
+              },
+              child: const Text('Settle'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.accountName}\'s PassBook'),
+        title: Text('${widget.accountName}\'s Balances'),
         actions: [
           PopupMenuButton<String>(
             itemBuilder: (context) => [
@@ -259,12 +419,18 @@ class _AccountPendingBalance extends State<AccountPendingBalance> {
                 value: 'reset_filters',
                 child: Text('Reset Filters'),
               ),
+              const PopupMenuItem<String>(
+                value: 'settle_balance',
+                child: Text('Settle Balance'),
+              ),
             ],
             onSelected: (value) {
               if (value == 'select_filters') {
-                showFilterDialog(); // Show filter dialog
+                showFilterDialog();
               } else if (value == 'reset_filters') {
                 clearFilters();
+              } else if(value == 'settle_balance'){
+                settlePendingBalance();
               }
             },
           ),

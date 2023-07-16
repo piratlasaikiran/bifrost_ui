@@ -20,7 +20,7 @@ class BalancesPage extends StatelessWidget {
           children: [
             _buildCircularButton(
               icon: Icons.pending_actions_rounded,
-              label: 'Pending Balances',
+              label: 'Balances',
               onTap: () async {
                 PassBookActions passBookActions = PassBookActions();
                 List<PendingBalanceDTO> pendingBalanceDTOs = await passBookActions.getAllPendingBalancesForAllUsers();

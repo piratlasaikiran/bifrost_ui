@@ -10,7 +10,6 @@ class SupervisorDTO {
   final int? mobileNumber;
   final String? bankAccountNumber;
   final int? salary;
-  final bool? admin;
   final int? companyMobileNumber;
   final int? atmCardNumber;
   final int? otPay;
@@ -21,7 +20,6 @@ class SupervisorDTO {
     required this.mobileNumber,
     required this.bankAccountNumber,
     required this.salary,
-    required this.admin,
     required this.companyMobileNumber,
     required this.atmCardNumber,
     required this.otPay
@@ -35,7 +33,6 @@ class SupervisorActions {
     required String? mobileNumber,
     required String? bankAccountNumber,
     required double? salary,
-    required bool? isAdmin,
     required File? aadhar,
     required String? companyMobileNumber,
     required String? atmCard,
@@ -48,7 +45,6 @@ class SupervisorActions {
       'personal_mobile_num': mobileNumber,
       'bank_ac': bankAccountNumber,
       'salary': salary,
-      'admin': isAdmin,
       'company_mob_num': companyMobileNumber,
       'atm_card': atmCard,
       'ot_pay': otPay
@@ -79,7 +75,6 @@ class SupervisorActions {
     required String? mobileNumber,
     required String? bankAccountNumber,
     required double? salary,
-    required bool? isAdmin,
     required File? aadhar,
     required String? companyMobileNumber,
     required String? atmCard,
@@ -92,7 +87,6 @@ class SupervisorActions {
       'personal_mobile_num': mobileNumber,
       'bank_ac': bankAccountNumber,
       'salary': salary,
-      'admin': isAdmin,
       'company_mob_num': companyMobileNumber,
       'atm_card': atmCard,
       'ot_pay': otPay
@@ -129,7 +123,6 @@ class SupervisorActions {
         mobileNumber: data['personal_mobile_num'] as int?,
         bankAccountNumber: data['bank_ac'] as String?,
         salary: data['salary'] as int?,
-        admin: data['admin'] as bool?,
         companyMobileNumber: data['company_mob_num'] as int?,
         atmCardNumber: data['atm_card'] as int?,
         otPay: data['ot_pay'] as int?,

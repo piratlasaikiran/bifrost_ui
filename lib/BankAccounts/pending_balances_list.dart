@@ -49,7 +49,7 @@ class _PendingBalancesList extends State<PendingBalancesList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PendingBalances'),
+        title: const Text('Balances'),
       ),
       body: Column(
         children: [

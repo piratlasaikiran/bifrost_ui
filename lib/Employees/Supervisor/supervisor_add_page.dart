@@ -25,7 +25,6 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
   String? _mobileNumber;
   String? _bankAccountNumber;
   double? _salary;
-  bool _admin = false;
   File? _aadharImage;
   String? _companyMobileNumber;
   String? _atmCardNumber;
@@ -70,7 +69,7 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
       }
 
       String? fullName = '${_firstName ?? ''} ${_lastName ?? ''}';
-      final result = await supervisorActions.saveSupervisor(name: fullName, mobileNumber: _mobileNumber, bankAccountNumber: _bankAccountNumber, salary: _salary, isAdmin: _admin,
+      final result = await supervisorActions.saveSupervisor(name: fullName, mobileNumber: _mobileNumber, bankAccountNumber: _bankAccountNumber, salary: _salary,
           aadhar: _aadharImage, companyMobileNumber: _companyMobileNumber, atmCard: _atmCardNumber, otPay: _otPay);
       if (result) {
         // Show success popup
@@ -274,15 +273,6 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
                 },
                 onSaved: (value) {
                   _salary = double.tryParse(value!);
-                },
-              ),
-              SwitchListTile(
-                title: const Text('Admin'),
-                value: _admin,
-                onChanged: (value) {
-                  setState(() {
-                    _admin = value;
-                  });
                 },
               ),
               _buildAadharImageWidget(),

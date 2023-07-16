@@ -20,7 +20,6 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
   String? _mobileNumber;
   String? _bankAccountNumber;
   double? _salary;
-  bool _admin = false;
   File? _aadharImage;
   File? _licenseImage;
   double? _otPayDay;
@@ -73,7 +72,6 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
           mobileNumber: _mobileNumber,
           bankAccountNumber: _bankAccountNumber,
           salary: _salary,
-          isAdmin: _admin,
           aadhar: _aadharImage,
           license: _licenseImage,
           otPayDay: _otPayDay,
@@ -347,15 +345,6 @@ class _DriverInputDialogState extends State<DriverInputDialog> {
                 },
                 onSaved: (value) {
                   _salary = double.tryParse(value!);
-                },
-              ),
-              SwitchListTile(
-                title: const Text('Admin'),
-                value: _admin,
-                onChanged: (value) {
-                  setState(() {
-                    _admin = value;
-                  });
                 },
               ),
               _buildAadharImageWidget(),

@@ -10,7 +10,6 @@ class DriverDTO {
   final int? mobileNumber;
   final String? bankAccountNumber;
   final int? salary;
-  final bool? admin;
   final int? otPayDay;
   final int? otPayDayNight;
 
@@ -20,7 +19,6 @@ class DriverDTO {
     required this.mobileNumber,
     required this.bankAccountNumber,
     required this.salary,
-    required this.admin,
     required this.otPayDay,
     required this.otPayDayNight
   });
@@ -33,7 +31,6 @@ class DriverActions {
     required String? mobileNumber,
     required String? bankAccountNumber,
     required double? salary,
-    required bool? isAdmin,
     required File? aadhar,
     required File? license,
     required double? otPayDay,
@@ -46,7 +43,6 @@ class DriverActions {
       'personal_mobile_num': mobileNumber,
       'bank_ac': bankAccountNumber,
       'salary': salary,
-      'admin': isAdmin,
       'ot_pay_day': otPayDay,
       'ot_pay_day_night': otPayDayNight
     };
@@ -84,7 +80,6 @@ class DriverActions {
         mobileNumber: data['personal_mobile_num'] as int?,
         bankAccountNumber: data['bank_ac'] as String?,
         salary: data['salary'] as int?,
-        admin: data['admin'] as bool?,
         otPayDay: data['ot_pay_day'] as int?,
         otPayDayNight: data['ot_pay_day_night'] as int?
       );
@@ -107,7 +102,6 @@ class DriverActions {
     required String? mobileNumber,
     required String? bankAccountNumber,
     required double? salary,
-    required bool? isAdmin,
     required File? aadhar,
     required File? license,
     required double? otPayDay,
@@ -120,7 +114,6 @@ class DriverActions {
       'personal_mobile_num': mobileNumber,
       'bank_ac': bankAccountNumber,
       'salary': salary,
-      'admin': isAdmin,
       'ot_pay_day': otPayDay,
       'ot_pay_day_night': otPayDayNight
     };
