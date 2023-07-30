@@ -14,14 +14,17 @@ class SupervisorInputDialog extends StatefulWidget {
 
 class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   BankAccountActions bankAccountActions = BankAccountActions();
+  SupervisorActions supervisorActions = SupervisorActions();
+
   late BuildContext dialogContext;
 
-  String? _name;
+  String? _firstName;
+  String? _lastName;
   String? _mobileNumber;
   String? _bankAccountNumber;
   double? _salary;
-  bool _admin = false;
   File? _aadharImage;
   String? _companyMobileNumber;
   String? _atmCardNumber;
@@ -65,8 +68,8 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
         return;
       }
 
-      SupervisorActions supervisorActions = SupervisorActions();
-      final result = await supervisorActions.saveSupervisor(name: _name, mobileNumber: _mobileNumber, bankAccountNumber: _bankAccountNumber, salary: _salary, isAdmin: _admin,
+      String? fullName = '${_firstName ?? ''} ${_lastName ?? ''}';
+      final result = await supervisorActions.saveSupervisor(name: fullName, mobileNumber: _mobileNumber, bankAccountNumber: _bankAccountNumber, salary: _salary,
           aadhar: _aadharImage, companyMobileNumber: _companyMobileNumber, atmCard: _atmCardNumber, otPay: _otPay);
       if (result) {
         // Show success popup
@@ -193,16 +196,32 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
             children: [
               TextFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Name',
+                  labelText: 'First Name',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a name';
+                    return 'Please enter first name';
                   }
                   return null;
                 },
                 onSaved: (value) {
-                  _name = value;
+                  _firstName = value;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Last Name',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter last name';
+                  } else if(value.contains(' ')){
+                    return 'Last Name can not contain space';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _lastName = value;
                 },
               ),
               TextFormField(
@@ -254,15 +273,6 @@ class _SupervisorInputDialogState extends State<SupervisorInputDialog> {
                 },
                 onSaved: (value) {
                   _salary = double.tryParse(value!);
-                },
-              ),
-              SwitchListTile(
-                title: const Text('Admin'),
-                value: _admin,
-                onChanged: (value) {
-                  setState(() {
-                    _admin = value;
-                  });
                 },
               ),
               _buildAadharImageWidget(),

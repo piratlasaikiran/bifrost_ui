@@ -1,7 +1,8 @@
 import 'dart:convert';
 
+import '../Utils/constants.dart';
 import '../Utils/formatting_util.dart';
-import '../Utils/user_manager.dart';
+import '../../utils/user_manager.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -27,6 +28,7 @@ class SiteDTO{
 
 class SiteActions{
 
+  String backendIp = Constants().awsIpAddress;
   FormattingUtility formattingUtility = FormattingUtility();
 
   Future<bool> saveSite({
@@ -39,7 +41,7 @@ class SiteActions{
     required DateTime? endDate,
   }) async {
       UserManager userManager = UserManager();
-      var url = Uri.parse('http://10.0.2.2:6852/bifrost/sites/create-new-site');
+      var url = Uri.parse('http://$backendIp:6852/bifrost/sites/create-new-site');
       var siteBody = {
         'site_name': siteName,
         'address': address,
@@ -69,7 +71,7 @@ class SiteActions{
 
   Future<List<SiteDTO>> getAllSites() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/sites/');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/sites/');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> siteDTOs = jsonDecode(response.body);
@@ -89,7 +91,7 @@ class SiteActions{
 
   Future<List<String>> getSiteStatuses() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/sites/get-statuses');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/sites/get-statuses');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> statuses = jsonDecode(response.body).cast<String>();
@@ -98,7 +100,7 @@ class SiteActions{
 
   Future<List<String>> getSiteNames() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/sites/get-site-names');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/sites/get-site-names');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> siteNames = jsonDecode(response.body).cast<String>();
@@ -116,7 +118,7 @@ class SiteActions{
     required DateTime? endDate,
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/sites/$initialSite/update-site');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/sites/$initialSite/update-site');
     var siteBody = {
       'site_name': siteName,
       'address': address,

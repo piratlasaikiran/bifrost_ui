@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:http_parser/http_parser.dart';
 
+import '../../Utils/constants.dart';
 import '../../utils/user_manager.dart';
 
 class SupervisorDTO {
@@ -10,7 +11,6 @@ class SupervisorDTO {
   final int? mobileNumber;
   final String? bankAccountNumber;
   final int? salary;
-  final bool? admin;
   final int? companyMobileNumber;
   final int? atmCardNumber;
   final int? otPay;
@@ -21,7 +21,6 @@ class SupervisorDTO {
     required this.mobileNumber,
     required this.bankAccountNumber,
     required this.salary,
-    required this.admin,
     required this.companyMobileNumber,
     required this.atmCardNumber,
     required this.otPay
@@ -30,25 +29,25 @@ class SupervisorDTO {
 
 class SupervisorActions {
 
+  String backendIp = Constants().awsIpAddress;
+
   Future<bool> saveSupervisor({
     required String? name,
     required String? mobileNumber,
     required String? bankAccountNumber,
     required double? salary,
-    required bool? isAdmin,
     required File? aadhar,
     required String? companyMobileNumber,
     required String? atmCard,
     required double? otPay,
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/create-new-supervisor');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/supervisors/create-new-supervisor');
     var formData = {
       'name': name,
       'personal_mobile_num': mobileNumber,
       'bank_ac': bankAccountNumber,
       'salary': salary,
-      'admin': isAdmin,
       'company_mob_num': companyMobileNumber,
       'atm_card': atmCard,
       'ot_pay': otPay
@@ -79,20 +78,18 @@ class SupervisorActions {
     required String? mobileNumber,
     required String? bankAccountNumber,
     required double? salary,
-    required bool? isAdmin,
     required File? aadhar,
     required String? companyMobileNumber,
     required String? atmCard,
     required double? otPay,
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/$existingSupervisor/update-supervisor');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/supervisors/$existingSupervisor/update-supervisor');
     var formData = {
       'name': name,
       'personal_mobile_num': mobileNumber,
       'bank_ac': bankAccountNumber,
       'salary': salary,
-      'admin': isAdmin,
       'company_mob_num': companyMobileNumber,
       'atm_card': atmCard,
       'ot_pay': otPay
@@ -119,7 +116,7 @@ class SupervisorActions {
 
   Future<List<SupervisorDTO>> getAllSupervisors() async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/supervisors/');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> supervisorDTOs = jsonDecode(response.body);
@@ -129,7 +126,6 @@ class SupervisorActions {
         mobileNumber: data['personal_mobile_num'] as int?,
         bankAccountNumber: data['bank_ac'] as String?,
         salary: data['salary'] as int?,
-        admin: data['admin'] as bool?,
         companyMobileNumber: data['company_mob_num'] as int?,
         atmCardNumber: data['atm_card'] as int?,
         otPay: data['ot_pay'] as int?,
@@ -140,7 +136,7 @@ class SupervisorActions {
 
   Future<List<String>> getSupervisorNames() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/get-supervisor-names');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/supervisors/get-supervisor-names');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> supervisorNames = jsonDecode(response.body).cast<String>();
@@ -149,7 +145,7 @@ class SupervisorActions {
 
   Future<File?> getAadhar(String supervisor) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/$supervisor/get-aadhar');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/supervisors/$supervisor/get-aadhar');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {

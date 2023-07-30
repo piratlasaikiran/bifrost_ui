@@ -5,6 +5,7 @@ import 'Attendance/attendance_options.dart';
 import 'Employees/employee_options_page.dart';
 import 'Sites/site_options_page.dart';
 import 'Transactions/transactions_options_page.dart';
+import 'UserProfile/profile_page.dart';
 import 'Vehicles/select_vehicles_and_taxes.dart';
 
 class HomePage extends StatelessWidget {
@@ -14,7 +15,40 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Page'),
+        title: const Text(
+          'Home Page',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProfilePage()),
+                  );
+                },
+                child: const Row(
+                  children: [
+                    Text(
+                      'My Profile',
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                    SizedBox(width: 5),
+                    Icon(Icons.person),
+                    SizedBox(width: 8),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: GridView.count(
         crossAxisCount: 2,

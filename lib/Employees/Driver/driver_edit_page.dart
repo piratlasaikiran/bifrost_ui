@@ -15,23 +15,27 @@ class DriverEditDialog extends StatefulWidget {
 
 class _DriverEditDialogState extends State<DriverEditDialog> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  DriverActions supervisorActions = DriverActions();
   DriverActions driverActions = DriverActions();
   late BuildContext dialogContext;
 
-  String? _name;
+  String? _firstName;
+  String? _lastName;
   String? _mobileNumber;
   String? _bankAccountNumber;
   double? _salary;
-  bool _admin = false;
   File? _aadharImage;
   File? _licenseImage;
   double? _otPayDay;
   double? _otPayDayNight;
 
+  @override
   void initState() {
     super.initState();
     _fetchAadhar();
     _fetchLicense();
+    _initialiseName();
   }
 
   Future<void> _fetchAadhar() async {
@@ -46,6 +50,11 @@ class _DriverEditDialogState extends State<DriverEditDialog> {
     setState(() {
       _licenseImage = licenseImage;
     });
+  }
+  void _initialiseName(){
+    List<String> nameParts = widget.driver.name.split(' ');
+    _firstName = nameParts.length > 1 ? nameParts.sublist(0, nameParts.length - 1).join(' ') : null;
+    _lastName = nameParts.isNotEmpty ? nameParts.last : null;
   }
 
   Future<void> _updateDriver() async {
@@ -90,13 +99,12 @@ class _DriverEditDialogState extends State<DriverEditDialog> {
         return;
       }
 
-      DriverActions supervisorActions = DriverActions();
+      String? fullName = '${_firstName ?? ''} ${_lastName ?? ''}';
       final result = await supervisorActions.updateDriver(existingDriver: widget.driver.name,
-          name: _name,
+          name: fullName,
           mobileNumber: _mobileNumber,
           bankAccountNumber: _bankAccountNumber,
           salary: _salary,
-          isAdmin: _admin,
           aadhar: _aadharImage,
           license: _licenseImage,
           otPayDay: _otPayDay,
@@ -287,7 +295,7 @@ class _DriverEditDialogState extends State<DriverEditDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Enter Driver Details'),
+      title: const Text('Edit Driver Details'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -295,17 +303,34 @@ class _DriverEditDialogState extends State<DriverEditDialog> {
             children: [
               TextFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Name',
+                  labelText: 'First Name',
                 ),
-                initialValue: widget.driver.name,
+                initialValue: _firstName,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a name';
+                    return 'Please enter first name';
                   }
                   return null;
                 },
                 onSaved: (value) {
-                  _name = value;
+                  _firstName = value;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Last Name',
+                ),
+                initialValue: _lastName,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter last name';
+                  } else if(value.contains(' ')){
+                    return 'Last Name can not contain space';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _lastName = value;
                 },
               ),
               TextFormField(
@@ -359,15 +384,6 @@ class _DriverEditDialogState extends State<DriverEditDialog> {
                 },
                 onSaved: (value) {
                   _salary = double.tryParse(value!);
-                },
-              ),
-              SwitchListTile(
-                title: const Text('Admin'),
-                value: widget.driver.admin!,
-                onChanged: (value) {
-                  setState(() {
-                    _admin = value;
-                  });
                 },
               ),
               _buildAadharImageWidget(),

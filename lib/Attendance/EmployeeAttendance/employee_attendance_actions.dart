@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:bifrost_ui/Utils/formatting_util.dart';
 
-import '../../Utils/user_manager.dart';
+import '../../Utils/constants.dart';
+import '../../utils/user_manager.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -32,12 +33,14 @@ class EmployeeAttendanceDTO{
 
 class EmployeeAttendanceActions {
 
+  String backendIp = Constants().awsIpAddress;
+
   FormattingUtility formattingUtility = FormattingUtility();
 
   Future<List<String>> getEmployeeTypes() async {
     UserManager userManager = UserManager();
     var url = Uri.parse(
-        'http://10.0.2.2:6852/bifrost/employee-attendance/employee-types');
+        'http://$backendIp:6852/bifrost/employee-attendance/employee-types');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> employeeTypes = jsonDecode(response.body).cast<String>();
@@ -47,7 +50,7 @@ class EmployeeAttendanceActions {
   Future<List<String>> getAttendanceTypes() async {
     UserManager userManager = UserManager();
     var url = Uri.parse(
-        'http://10.0.2.2:6852/bifrost/employee-attendance/attendance-types');
+        'http://$backendIp:6852/bifrost/employee-attendance/attendance-types');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> attendanceTypes = jsonDecode(response.body).cast<String>();
@@ -65,7 +68,7 @@ class EmployeeAttendanceActions {
   }) async {
     UserManager userManager = UserManager();
     var url = Uri.parse(
-        'http://10.0.2.2:6852/bifrost/employee-attendance/enter-attendance');
+        'http://$backendIp:6852/bifrost/employee-attendance/enter-attendance');
     var attendanceBody = {
       'site': site,
       'employee_name': employeeName,
@@ -97,7 +100,7 @@ class EmployeeAttendanceActions {
 
   Future<List<EmployeeAttendanceDTO>> getAllEmployeeAttendance() async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/employee-attendance/');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/employee-attendance/');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> vendorAttendanceDTOs = jsonDecode(response.body);
@@ -129,7 +132,7 @@ class EmployeeAttendanceActions {
   }) async {
     UserManager userManager = UserManager();
     var url = Uri.parse(
-        'http://10.0.2.2:6852/bifrost/employee-attendance/$existingAttendanceId/update-attendance');
+        'http://$backendIp:6852/bifrost/employee-attendance/$existingAttendanceId/update-attendance');
     var attendanceBody = {
       'site': site,
       'employee_name': employeeName,

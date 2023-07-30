@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:bifrost_ui/Utils/constants.dart';
+
 import '../Utils/formatting_util.dart';
-import '../Utils/user_manager.dart';
+import '../../utils/user_manager.dart';
 import 'package:http/http.dart' as http;
 
 class AssetLocationDTO {
@@ -42,11 +44,13 @@ class AssetOwnershipDTO {
 
 class AssetActions{
 
+  String backendIp = Constants().awsIpAddress;
+
   FormattingUtility formattingUtility = FormattingUtility();
 
   Future<List<AssetLocationDTO>> getAllAssetLocations() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/asset-management/asset-locations');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/asset-management/asset-locations');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> assetLocationDTOs = jsonDecode(response.body);
@@ -65,7 +69,7 @@ class AssetActions{
 
   Future<List<AssetOwnershipDTO>> getAllAssetOwnerships() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/asset-management/asset-ownerships');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/asset-management/asset-ownerships');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> assetOwnershipDTOs = jsonDecode(response.body);
@@ -90,7 +94,7 @@ class AssetActions{
     required DateTime? endDate
   }) async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/asset-management/create-asset-location');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/asset-management/create-asset-location');
     var siteBody = {
       'asset_type': assetType,
       'asset_name': assetName,
@@ -123,7 +127,7 @@ class AssetActions{
     required DateTime? endDate
   }) async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/asset-management/$assetLocationId/update-asset-location');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/asset-management/$assetLocationId/update-asset-location');
     var siteBody = {
       'asset_location_id': assetLocationId,
       'asset_type': assetType,
@@ -156,7 +160,7 @@ class AssetActions{
     required DateTime? endDate
   }) async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/asset-management/create-asset-ownership');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/asset-management/create-asset-ownership');
     var siteBody = {
       'asset_type': assetType,
       'asset_name': assetName,
@@ -189,7 +193,7 @@ class AssetActions{
     required DateTime? endDate
   }) async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/asset-management/$assetOwnershipId/update-asset-ownership');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/asset-management/$assetOwnershipId/update-asset-ownership');
     var siteBody = {
       'asset_ownership_id': assetOwnershipId,
       'asset_type': assetType,

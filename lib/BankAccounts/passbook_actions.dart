@@ -1,9 +1,13 @@
 import 'dart:convert';
 
+import 'package:http_parser/http_parser.dart';
+
 import '../Transactions/transaction_actions.dart';
-import '../Utils/user_manager.dart';
+import '../../utils/user_manager.dart';
 
 import 'package:http/http.dart' as http;
+
+import '../Utils/constants.dart';
 
 class PassBookDTO{
   final String accountName;
@@ -23,13 +27,27 @@ class PassBookDTO{
   });
 }
 
+class PendingBalanceDTO{
+  final String accountName;
+  final TransactionDTO transactionDTO;
+  final int pendingBalance;
+
+  PendingBalanceDTO({
+    required this.accountName,
+    required this.transactionDTO,
+    required this.pendingBalance
+  });
+}
+
 class PassBookActions{
 
+  String backendIp = Constants().awsIpAddress;
+
   TransactionActions transactionActions = TransactionActions();
+  UserManager userManager = UserManager();
 
   Future<List<PassBookDTO>> getAllPassBookMainPages() async {
-    UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/passbook-main-pages');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/passbook-main-pages');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> transactionDTOs = jsonDecode(response.body);
@@ -47,8 +65,7 @@ class PassBookActions{
   }
 
   Future<List<PassBookDTO>> getPassBookEntries(String accountName) async {
-    UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/passbooks/$accountName');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/passbooks/$accountName');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> transactionDTOs = jsonDecode(response.body);
@@ -63,5 +80,68 @@ class PassBookActions{
       );
     }).toList();
     return passBookEntries;
+  }
+
+  Future<List<PendingBalanceDTO>> getAllPendingBalancesForAllUsers() async {
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/pending-balances');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<dynamic> pendingBalanceDTOs = jsonDecode(response.body);
+    final List<PendingBalanceDTO> pendingBalances = pendingBalanceDTOs.map((data) {
+      return PendingBalanceDTO(
+          accountName: data['account_name'] as String,
+          transactionDTO: transactionActions.getTransactionDTO(data['transaction']),
+          pendingBalance: data['pending_balance'] as int
+      );
+    }).toList();
+    return pendingBalances;
+  }
+
+  Future<List<PendingBalanceDTO>> getPendingBalanceEntriesForAccount(String accountName) async {
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/account-name/$accountName/account-pending-balances');
+    var headers = {'X-User-Id': userManager.username};
+    var response = await http.get(url, headers: headers);
+    List<dynamic> pendingBalanceDTOs = jsonDecode(response.body);
+    final List<PendingBalanceDTO> pendingBalances = pendingBalanceDTOs.map((data) {
+      return PendingBalanceDTO(
+          accountName: data['account_name'] as String,
+          transactionDTO: transactionActions.getTransactionDTO(data['transaction']),
+          pendingBalance: data['pending_balance'] as int
+      );
+    }).toList();
+    return pendingBalances;
+  }
+
+  Future<bool> settlePendingBalanceForUser({
+    required String accountName,
+    required String mode,
+    required String bankAccount,
+    required String? remarks
+  }) async {
+    UserManager userManager = UserManager();
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/account-name/$accountName/settle-pending-balance');
+    var formData = {
+      'payer': userManager.username,
+      'payee': accountName,
+      'remarks': remarks,
+      'mode': mode,
+      'bank_account': bankAccount
+    };
+    var jsonPart = http.MultipartFile.fromString(
+      'settleBalancePayload',
+      jsonEncode(formData),
+      contentType: MediaType('application', 'json'),
+    );
+    var request = http.MultipartRequest('POST', url);
+
+    request.headers['X-User-Id'] = userManager.username;
+    request.files.add(jsonPart);
+
+    var response = await request.send();
+    if(response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

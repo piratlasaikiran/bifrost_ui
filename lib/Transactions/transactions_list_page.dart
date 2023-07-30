@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bifrost_ui/Transactions/transaction_actions.dart';
 import 'package:bifrost_ui/Transactions/transaction_state_change.dart';
 import 'package:flutter/material.dart';
@@ -207,7 +209,6 @@ class _TransactionListPageState extends State<TransactionListPage> {
     }
   }
 
-
   Future<void> _selectTransactionsEndDate() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -258,13 +259,33 @@ class _TransactionListPageState extends State<TransactionListPage> {
     return ListTile(
       title: Row(
         children: [
-          Text(transaction.source,
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+          Flexible(
+            child: GestureDetector(
+              onTapDown: (TapDownDetails details) {
+                showFullNameOverlay(details.globalPosition, transaction.source);
+              },
+              child: Text(
+                transaction.source,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
           const SizedBox(width: 6),
           const Icon(Icons.arrow_forward),
           const SizedBox(width: 6),
-          Text(transaction.destination,
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+          Flexible(
+            child: GestureDetector(
+              onTapDown: (TapDownDetails details) {
+                showFullNameOverlay(details.globalPosition, transaction.destination);
+              },
+              child: Text(
+                transaction.destination,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
         ],
       ),
       subtitle: Column(
@@ -278,7 +299,7 @@ class _TransactionListPageState extends State<TransactionListPage> {
               Row(
                 children: [
                   Chip(
-                    label: Text(transaction.purpose ?? ''),
+                    label: Text(transaction.purpose),
                     backgroundColor: Colors.blue,
                     labelStyle: const TextStyle(
                       color: Colors.white,
@@ -287,7 +308,7 @@ class _TransactionListPageState extends State<TransactionListPage> {
                   ),
                   const SizedBox(width: 4),
                   Chip(
-                    label: Text(transaction.mode ?? ''),
+                    label: Text(transaction.mode),
                     backgroundColor: Colors.orange,
                     labelStyle: const TextStyle(
                       color: Colors.white,
@@ -300,9 +321,6 @@ class _TransactionListPageState extends State<TransactionListPage> {
           ),
         ],
       ),
-
-
-
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -332,7 +350,7 @@ class _TransactionListPageState extends State<TransactionListPage> {
                     ),
                   );
                 });
-              }else if (value == 'change_status') {
+              } else if (value == 'change_status') {
                 Future.microtask(() {
                   Navigator.push(
                     context,
@@ -350,7 +368,47 @@ class _TransactionListPageState extends State<TransactionListPage> {
     );
   }
 
+  OverlayEntry? fullNameOverlayEntry;
 
+  void showFullNameOverlay(Offset position, String fullName) {
+    fullNameOverlayEntry?.remove();
+    fullNameOverlayEntry = null;
+
+    final RenderBox? overlay = Overlay.of(context).context.findRenderObject() as RenderBox?;
+
+    if (overlay != null) {
+
+      fullNameOverlayEntry = OverlayEntry(
+        builder: (context) => Positioned(
+          top: position.dy,
+          left: position.dx,
+          child: AnimatedOpacity(
+            opacity: 1.0,
+            duration: const Duration(seconds: 2),
+            curve: Curves.easeInOut,
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(4.0),
+              ),
+              child: Text(
+                fullName,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      Overlay.of(context).insert(fullNameOverlayEntry!);
+
+      Future.delayed(const Duration(seconds: 2), () {
+        fullNameOverlayEntry?.remove();
+        fullNameOverlayEntry = null;
+      });
+    }
+  }
 
   void showFilterDialog() {
     showDialog(

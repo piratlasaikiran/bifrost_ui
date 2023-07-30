@@ -6,8 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:intl/intl.dart';
 
+import '../Utils/constants.dart';
 import '../Utils/formatting_util.dart';
-import '../utils/user_manager.dart';
+import '../../utils/user_manager.dart';
 import 'add_vehicle_dialog.dart';
 
 class VehicleDTO {
@@ -51,6 +52,7 @@ class VehicleTaxDTO {
 
 class VehicleActions{
 
+  String backendIp = Constants().awsIpAddress;
   FormattingUtility formattingUtility = FormattingUtility();
 
   Future<bool> saveVehicle({
@@ -65,7 +67,7 @@ class VehicleActions{
   }) async{
 
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/create-new-vehicle');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vehicles/create-new-vehicle');
     var formData = {
       'vehicle_num': vehicleNumber,
       'owner': owner,
@@ -143,7 +145,7 @@ class VehicleActions{
 
   Future<List<VehicleDTO>> getAllVehicles() async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vehicles/');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> vehicleDTOs = jsonDecode(response.body);
@@ -163,7 +165,7 @@ class VehicleActions{
 
   Future<List<String>> getVehicleNumbers() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/get-vehicle-numbers');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vehicles/get-vehicle-numbers');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> vehicleNumbers = jsonDecode(response.body).cast<String>();
@@ -172,7 +174,7 @@ class VehicleActions{
 
   Future<List<String>> getVehicleTaxTypes() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/tax-types');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vehicles/tax-types');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> vehicleTaxTypes = jsonDecode(response.body).cast<String>();
@@ -188,7 +190,7 @@ class VehicleActions{
     required File? receipt,
   }) async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/$vehicleNumber/upload-new-vehicle-tax');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vehicles/$vehicleNumber/upload-new-vehicle-tax');
     var formData = {
       'vehicle_num': vehicleNumber,
       'tax_type': taxType,
@@ -228,7 +230,7 @@ class VehicleActions{
     required File? receipt,
   }) async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/$vehicleNumber/tax-type/$existingTaxType/validity-start-date/$existingValidityStartDate/update-vehicle-tax');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vehicles/$vehicleNumber/tax-type/$existingTaxType/validity-start-date/$existingValidityStartDate/update-vehicle-tax');
     var formData = {
       'vehicle_num': vehicleNumber,
       'tax_type': taxType,
@@ -268,7 +270,7 @@ class VehicleActions{
   }) async{
     UserManager userManager = UserManager();
     String encodedVehicleNumber = Uri.encodeComponent(currentVehicleNumber);
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/$encodedVehicleNumber/update-vehicle');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vehicles/$encodedVehicleNumber/update-vehicle');
     var formData = {
       'vehicle_num': vehicleNumber,
       'owner': owner,
@@ -297,7 +299,7 @@ class VehicleActions{
 
   Future<Map<String, List<VehicleTaxDTO>>> getLatestTaxTypesForAllVehicles() async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/get-latest-vehicle-taxes');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vehicles/get-latest-vehicle-taxes');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     Map<String, dynamic> vehicleTaxes = jsonDecode(response.body);
@@ -333,7 +335,7 @@ class VehicleActions{
 
   Future<List<VehicleTaxDTO>> getVehicleTaxes(String vehicleNumber) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/$vehicleNumber/get-vehicle-taxes');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vehicles/$vehicleNumber/get-vehicle-taxes');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> vehicleTaxDTOs = jsonDecode(response.body);
@@ -347,7 +349,7 @@ class VehicleActions{
   Future<File?> getTaxDocument(String vehicleNumber, String? taxType, DateTime validityStartDate) async {
     UserManager userManager = UserManager();
     String formattedDate = DateFormat('yyyy-MM-dd').format(validityStartDate);
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vehicles/$vehicleNumber/tax-type/$taxType/validity-start-date/$formattedDate/get-vehicle-tax-document');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vehicles/$vehicleNumber/tax-type/$taxType/validity-start-date/$formattedDate/get-vehicle-tax-document');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
