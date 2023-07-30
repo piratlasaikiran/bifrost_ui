@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 
+import '../Utils/constants.dart';
 import '../Utils/formatting_util.dart';
 import '../../utils/user_manager.dart';
 import 'package:http/http.dart' as http;
@@ -39,6 +40,7 @@ class TransactionDTO{
 
 class TransactionActions{
 
+  String backendIp = Constants().awsIpAddress;
   FormattingUtility formattingUtility = FormattingUtility();
 
   Future<bool> saveTransaction({
@@ -55,7 +57,7 @@ class TransactionActions{
     required String? remarks
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/create-new-transaction');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/create-new-transaction');
     var formData = {
       'source': source,
       'destination': destination,
@@ -92,7 +94,7 @@ class TransactionActions{
 
   Future<List<TransactionDTO>> getAllTransactions() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> transactionDTOs = jsonDecode(response.body);
@@ -121,7 +123,7 @@ class TransactionActions{
 
   Future<List<String>> getModes() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/transaction-modes');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/transaction-modes');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> modes = jsonDecode(response.body).cast<String>();
@@ -130,7 +132,7 @@ class TransactionActions{
 
   Future<List<String>> getStatuses() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/transaction-statuses');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/transaction-statuses');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> statuses = jsonDecode(response.body).cast<String>();
@@ -139,7 +141,7 @@ class TransactionActions{
 
   Future<List<String>> getPurposes() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/transaction-purposes');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/transaction-purposes');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> purposes = jsonDecode(response.body).cast<String>();
@@ -161,7 +163,7 @@ class TransactionActions{
     required String? remarks
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/$transactionId/update-transaction');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/$transactionId/update-transaction');
     var formData = {
       'source': source,
       'destination': destination,
@@ -198,7 +200,7 @@ class TransactionActions{
 
   Future<File?> getBill(int transactionId) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/$transactionId/get-bill');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/$transactionId/get-bill');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
@@ -223,7 +225,7 @@ class TransactionActions{
     required String? desiredStatus,
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/$transactionId/update-transaction-status');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/$transactionId/update-transaction-status');
     var statusChangeRequestBodyBody = {
       'transaction_id': transactionId,
       'desired_status': desiredStatus,
@@ -246,7 +248,7 @@ class TransactionActions{
 
   Future<Map<String, List<String>>> getStatusChangeMap() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/transactions/state-changes');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/transactions/state-changes');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     Map<String, dynamic> responseMap = jsonDecode(response.body);

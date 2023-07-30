@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:http_parser/http_parser.dart';
 
+import '../../Utils/constants.dart';
 import '../../utils/user_manager.dart';
 
 class DriverDTO {
@@ -26,6 +27,8 @@ class DriverDTO {
 
 class DriverActions {
 
+  String backendIp = Constants().awsIpAddress;
+
   Future<bool> saveDriver({
     required String? name,
     required String? mobileNumber,
@@ -37,7 +40,7 @@ class DriverActions {
     required double? otPayDayNight
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/drivers/create-new-driver');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/drivers/create-new-driver');
     var formData = {
       'name': name,
       'personal_mobile_num': mobileNumber,
@@ -70,7 +73,7 @@ class DriverActions {
 
   Future<List<DriverDTO>> getAllDrivers() async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/drivers/');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/drivers/');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> driverDTOs = jsonDecode(response.body);
@@ -89,7 +92,7 @@ class DriverActions {
 
   Future<List<String>> getDriverNames() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/drivers/names');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/drivers/names');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> driverNames = jsonDecode(response.body).cast<String>();
@@ -108,7 +111,7 @@ class DriverActions {
     required double? otPayDayNight
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/drivers/$existingDriver/update-driver');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/drivers/$existingDriver/update-driver');
     var formData = {
       'name': name,
       'personal_mobile_num': mobileNumber,
@@ -141,7 +144,7 @@ class DriverActions {
 
   Future<File?> getAadhar(String driver) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/drivers/$driver/get-aadhar');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/drivers/$driver/get-aadhar');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
@@ -157,7 +160,7 @@ class DriverActions {
 
   Future<File?> getLicense(String driver) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/drivers/$driver/get-license');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/drivers/$driver/get-license');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {

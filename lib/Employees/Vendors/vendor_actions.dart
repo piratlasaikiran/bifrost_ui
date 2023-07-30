@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 
+import '../../Utils/constants.dart';
 import '../../Utils/formatting_util.dart';
 import '../../utils/user_manager.dart';
 
@@ -49,6 +50,7 @@ class VendorAttendanceDTO{
 
 class VendorActions{
 
+  String backendIp = Constants().awsIpAddress;
   FormattingUtility formattingUtility = FormattingUtility();
 
   Future<bool> saveAttendance({
@@ -60,7 +62,7 @@ class VendorActions{
     required String? bankAccount,
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendor-attendance/enter-attendance');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vendor-attendance/enter-attendance');
     var attendanceBody = {
       'site': site,
       'vendor_id': vendorId,
@@ -89,7 +91,7 @@ class VendorActions{
 
   Future<List<String>> getVendorPurposes() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/get-vendor-purposes');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vendors/get-vendor-purposes');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> vendorPurposes = jsonDecode(response.body).cast<String>();
@@ -98,7 +100,7 @@ class VendorActions{
 
   Future<Map<String, String>> getCommodityBaseUnits() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/get-commodity-unit-types');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vendors/get-commodity-unit-types');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     Map<String, String> decodedData = Map<String, String>.from(jsonDecode(response.body));
@@ -107,7 +109,7 @@ class VendorActions{
 
   Future<Map<String, String>> getCommodityAttendanceUnits(String vendorId) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/$vendorId/get-commodity-attendance-units');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vendors/$vendorId/get-commodity-attendance-units');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     Map<String, String> decodedData = Map<String, String>.from(jsonDecode(response.body));
@@ -125,7 +127,7 @@ class VendorActions{
     required Map<String, int> selectedCommodities,
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/create-new-vendor');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vendors/create-new-vendor');
     var formData = {
       'name': name,
       'vendor_id': vendorId,
@@ -156,7 +158,7 @@ class VendorActions{
 
   Future<List<VendorDTO>> getAllVendors() async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vendors/');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> vendorDTOs = jsonDecode(response.body);
@@ -187,7 +189,7 @@ class VendorActions{
 
   Future<List<String>> getVendorIds() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/ids');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vendors/ids');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> vendorIds = jsonDecode(response.body).cast<String>();
@@ -196,7 +198,7 @@ class VendorActions{
 
   Future<List<VendorAttendanceDTO>> getAllVendorAttendance() async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendor-attendance/');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vendor-attendance/');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> vendorAttendanceDTOs = jsonDecode(response.body);
@@ -217,7 +219,7 @@ class VendorActions{
 
   Future<File?> getContractDoc(String vendorId) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/$vendorId/get-contract-document');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vendors/$vendorId/get-contract-document');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
@@ -248,7 +250,7 @@ class VendorActions{
     required Map<String, int> selectedCommodities,
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/vendors/$existingVendorId/update-vendor');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/vendors/$existingVendorId/update-vendor');
     var formData = {
       'name': name,
       'vendor_id': vendorId,
@@ -288,7 +290,7 @@ class VendorActions{
   }) async {
     UserManager userManager = UserManager();
     var url = Uri.parse(
-        'http://10.0.2.2:6852/bifrost/vendor-attendance/$existingVendorAttendanceId/update-vendor-attendance');
+        'http://$backendIp:6852/bifrost/vendor-attendance/$existingVendorAttendanceId/update-vendor-attendance');
     var attendanceBody = {
       'site': site,
       'vendor_id': vendorId,

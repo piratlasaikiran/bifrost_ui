@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:http_parser/http_parser.dart';
 
+import '../../Utils/constants.dart';
 import '../../utils/user_manager.dart';
 
 class SupervisorDTO {
@@ -28,6 +29,8 @@ class SupervisorDTO {
 
 class SupervisorActions {
 
+  String backendIp = Constants().awsIpAddress;
+
   Future<bool> saveSupervisor({
     required String? name,
     required String? mobileNumber,
@@ -39,7 +42,7 @@ class SupervisorActions {
     required double? otPay,
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/create-new-supervisor');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/supervisors/create-new-supervisor');
     var formData = {
       'name': name,
       'personal_mobile_num': mobileNumber,
@@ -81,7 +84,7 @@ class SupervisorActions {
     required double? otPay,
   }) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/$existingSupervisor/update-supervisor');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/supervisors/$existingSupervisor/update-supervisor');
     var formData = {
       'name': name,
       'personal_mobile_num': mobileNumber,
@@ -113,7 +116,7 @@ class SupervisorActions {
 
   Future<List<SupervisorDTO>> getAllSupervisors() async{
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/supervisors/');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<dynamic> supervisorDTOs = jsonDecode(response.body);
@@ -133,7 +136,7 @@ class SupervisorActions {
 
   Future<List<String>> getSupervisorNames() async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/get-supervisor-names');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/supervisors/get-supervisor-names');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     List<String> supervisorNames = jsonDecode(response.body).cast<String>();
@@ -142,7 +145,7 @@ class SupervisorActions {
 
   Future<File?> getAadhar(String supervisor) async {
     UserManager userManager = UserManager();
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/supervisors/$supervisor/get-aadhar');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/supervisors/$supervisor/get-aadhar');
     var headers = {'X-User-Id': userManager.username};
     var response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
