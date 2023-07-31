@@ -86,7 +86,7 @@ class _SiteListPage extends State<SiteListPage> {
                             site.siteName ?? '',
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                           ),
-                          subtitle: Text('Mob: ${site.siteStatus ?? ''}'),
+                          subtitle: Text('Status: ${site.siteStatus ?? ''}'),
                           trailing: PopupMenuButton<String>(
                             itemBuilder: (context) {
                               return [

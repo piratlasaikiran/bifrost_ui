@@ -69,7 +69,7 @@ class _EditSiteDialogState extends State<EditSiteDialog> {
   void _setInitialValues(){
     setState(() {
       _startDate = formattingUtility.getDateInDateTimeFormat(widget.site.startDate);
-      _endDate = formattingUtility.getDateInDateTimeFormat(widget.site.endDate);
+      _endDate = widget.site.endDate != null ? formattingUtility.getDateInDateTimeFormat(widget.site.endDate!) : null;
       _selectedIncharges = widget.site.supervisors!;
       _selectedVehicles = widget.site.vehicles!;
       _selectedStatus = widget.site.siteStatus;

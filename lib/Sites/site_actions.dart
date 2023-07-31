@@ -13,7 +13,7 @@ class SiteDTO{
   final List<String>? supervisors;
   final List<String>? vehicles;
   final String startDate;
-  final String endDate;
+  final String? endDate;
 
   SiteDTO({
     required this.siteName,
@@ -83,7 +83,7 @@ class SiteActions{
           supervisors: (data['supervisors'] as List<dynamic>?)?.map((supervisor) => supervisor as String).toList(),
           vehicles: (data['vehicles'] as List<dynamic>?)?.map((vehicle) => vehicle as String).toList(),
           startDate: formattingUtility.getDateStringFromLocalDate(data['work_start_date']),
-        endDate: formattingUtility.getDateStringFromLocalDate(data['work_end_date']),
+        endDate: data['work_end_date'] != null ? formattingUtility.getDateStringFromLocalDate(data['work_end_date']) : null,
       );
     }).toList();
     return sites;

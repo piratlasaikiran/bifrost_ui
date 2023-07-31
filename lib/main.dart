@@ -5,6 +5,7 @@ import 'package:http_parser/http_parser.dart';
 
 import 'dart:convert';
 
+import 'Utils/constants.dart';
 import 'home_page.dart';
 
 void main() {
@@ -37,11 +38,12 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<bool> sendFormData(String userName, String password) async {
 
+    String backendIp = Constants().awsIpAddress;
     //Storing via singleton manner to access across application
     UserManager userManager = UserManager();
     userManager.username = userName;
 
-    var url = Uri.parse('http://10.0.2.2:6852/bifrost/users/login');
+    var url = Uri.parse('http://$backendIp:6852/bifrost/users/login');
     var formData = {
       'username': userName,
       'password': password
@@ -66,25 +68,42 @@ class _LoginPageState extends State<LoginPage> {
 
   void login() {
     if (userName.isNotEmpty && password.isNotEmpty) {
-
       sendFormData(userName, password).then((success) {
-        showDialog(
-          context: context,
-          builder: (context) => const AlertDialog(
-            title: Text('Login Successful'),
-            content: Text('Welcome to Bifrost!'),
-            actions: [],
-          ),
-        );
-
-        // Delay for 1 second
-        Future.delayed(const Duration(seconds: 1), () {
-          Navigator.of(context).pop(); // Dismiss the dialog
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
+        if (success) {
+          showDialog(
+            context: context,
+            builder: (context) => const AlertDialog(
+              title: Text('Login Successful'),
+              content: Text('Welcome to Bifrost!'),
+              actions: [],
+            ),
           );
-        });
+
+          // Delay for 1 second
+          Future.delayed(const Duration(seconds: 1), () {
+            Navigator.of(context).pop(); // Dismiss the dialog
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          });
+        } else {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Invalid Credentials'),
+              content: const Text('Please enter a valid username and password.'),
+              actions: [
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          );
+        }
       });
     } else {
       showDialog(

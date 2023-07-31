@@ -371,12 +371,6 @@ class _VendorInputDialogState extends State<VendorInputDialog> {
                     _selectedLocation = value;
                   });
                 },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a location';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 16.0),
               TextFormField(

@@ -122,7 +122,9 @@ class _VendorListPage extends State<VendorListPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('ID: ${vendor.vendorId ?? ''}'),
-                              Text('Site: ${vendor.location ?? ''}'),
+                              vendor.location != null
+                                  ? Text('Site: ${vendor.location}')
+                                  : const SizedBox(),
                               const SizedBox(height: 6.0),
                               Wrap(
                                 spacing: 8.0,
